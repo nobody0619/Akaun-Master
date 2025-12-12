@@ -123,61 +123,187 @@ export const generateSnQuestion = (): DrillSnQuestion => {
     };
 };
 
-// Placeholder Accruals Data
+// Accruals Data - Level 1 (Simple / No Date)
 export const ACCRUALS_L1_QUESTIONS: DrillAccrualQuestion[] = [
+    // Kumpulan A: Belanja Prabayar (Aset Semasa)
     {
-        id: 'acc1',
-        itemLabel: 'Sewa',
-        trialBalanceAmount: 10000,
-        adjustmentInfo: 'Sewa belum bayar RM2000.',
-        type: 'ACCRUED_EXP',
-        correctPkkCategory: 'LS',
-        correctPkkAmount: 2000,
-        correctFinalAmount: 12000
-    },
-    {
-        id: 'acc2',
+        id: 'acc-l1-1',
         itemLabel: 'Insurans',
-        trialBalanceAmount: 2400,
-        adjustmentInfo: 'Insurans prabayar RM400.',
+        trialBalanceAmount: 2000,
+        adjustmentInfo: 'Insurans prabayar berjumlah RM 400.',
         type: 'PREPAID_EXP',
         correctPkkCategory: 'AS',
         correctPkkAmount: 400,
-        correctFinalAmount: 2000
+        correctFinalAmount: 1600
     },
     {
-        id: 'acc3',
-        itemLabel: 'Komisen Diterima',
+        id: 'acc-l1-2',
+        itemLabel: 'Sewa',
         trialBalanceAmount: 5000,
-        adjustmentInfo: 'Komisen belum terima RM500.',
-        type: 'ACCRUED_REV',
+        adjustmentInfo: 'Sewa prabayar adalah sebanyak RM 1,000.',
+        type: 'PREPAID_EXP',
         correctPkkCategory: 'AS',
-        correctPkkAmount: 500,
-        correctFinalAmount: 5500
+        correctPkkAmount: 1000,
+        correctFinalAmount: 4000
+    },
+    // Kumpulan B: Belanja Belum Bayar (Liabiliti Semasa)
+    {
+        id: 'acc-l1-3',
+        itemLabel: 'Gaji',
+        trialBalanceAmount: 15000,
+        adjustmentInfo: 'Gaji belum bayar berjumlah RM 2,000.',
+        type: 'ACCRUED_EXP',
+        correctPkkCategory: 'LS',
+        correctPkkAmount: 2000,
+        correctFinalAmount: 17000
     },
     {
-        id: 'acc4',
+        id: 'acc-l1-4',
+        itemLabel: 'Kadar Bayaran',
+        trialBalanceAmount: 3500,
+        adjustmentInfo: 'Kadar bayaran belum bayar adalah sebanyak RM 300.',
+        type: 'ACCRUED_EXP',
+        correctPkkCategory: 'LS',
+        correctPkkAmount: 300,
+        correctFinalAmount: 3800
+    },
+    // Kumpulan C: Hasil Belum Terperoleh (Liabiliti Semasa)
+    {
+        id: 'acc-l1-5',
         itemLabel: 'Sewa Diterima',
         trialBalanceAmount: 8000,
-        adjustmentInfo: 'Sewa belum terperoleh RM1000.',
+        adjustmentInfo: 'Sewa belum terperoleh berjumlah RM 1,200.',
         type: 'UNEARNED_REV',
         correctPkkCategory: 'LS',
-        correctPkkAmount: 1000,
-        correctFinalAmount: 7000
+        correctPkkAmount: 1200,
+        correctFinalAmount: 6800
+    },
+    {
+        id: 'acc-l1-6',
+        itemLabel: 'Komisen Diterima',
+        trialBalanceAmount: 4500,
+        adjustmentInfo: 'Komisen belum terperoleh adalah sebanyak RM 500.',
+        type: 'UNEARNED_REV',
+        correctPkkCategory: 'LS',
+        correctPkkAmount: 500,
+        correctFinalAmount: 4000
+    },
+    // Kumpulan D: Hasil Belum Terima (Aset Semasa)
+    {
+        id: 'acc-l1-7',
+        itemLabel: 'Faedah Simpanan',
+        trialBalanceAmount: 900,
+        adjustmentInfo: 'Faedah simpanan belum terima berjumlah RM 300.',
+        type: 'ACCRUED_REV',
+        correctPkkCategory: 'AS',
+        correctPkkAmount: 300,
+        correctFinalAmount: 1200
+    },
+    {
+        id: 'acc-l1-8',
+        itemLabel: 'Sewa Diterima',
+        trialBalanceAmount: 10000,
+        adjustmentInfo: 'Sewa belum terima adalah sebanyak RM 2,000.',
+        type: 'ACCRUED_REV',
+        correctPkkCategory: 'AS',
+        correctPkkAmount: 2000,
+        correctFinalAmount: 12000
     }
 ];
 
+// Accruals Data - Level 2 (Complex / With Date)
 export const ACCRUALS_L2_QUESTIONS: DrillAccrualQuestion[] = [
+    // Kumpulan A: Belanja Prabayar (Aset Semasa)
     {
-        id: 'acc5',
-        yearEndDate: '31 Dis 2024',
+        id: 'acc-l2-1',
+        yearEndDate: '31 Disember 2024',
         itemLabel: 'Insurans',
-        trialBalanceAmount: 3600,
-        adjustmentInfo: 'Insurans tahunan RM2400 dibayar mulai 1 April 2024.',
+        trialBalanceAmount: 2400,
+        adjustmentInfo: 'Insurans tersebut dibayar untuk tempoh setahun bermula 1 Oktober 2024.',
         type: 'PREPAID_EXP',
         correctPkkCategory: 'AS',
-        correctPkkAmount: 600, // 3 months x 200
-        correctFinalAmount: 3000
+        correctPkkAmount: 1800, // Jan-Sept 2025 (9 months) * 200
+        correctFinalAmount: 600
+    },
+    {
+        id: 'acc-l2-2',
+        yearEndDate: '30 Jun 2025',
+        itemLabel: 'Iklan',
+        trialBalanceAmount: 1200,
+        adjustmentInfo: 'Iklan telah dibayar untuk setahun berakhir 30 September 2025.',
+        type: 'PREPAID_EXP',
+        correctPkkCategory: 'AS',
+        correctPkkAmount: 300, // Jul-Sept 2025 (3 months) * 100
+        correctFinalAmount: 900
+    },
+    // Kumpulan B: Belanja Belum Bayar (Liabiliti Semasa)
+    {
+        id: 'acc-l2-3',
+        yearEndDate: '31 Disember 2024',
+        itemLabel: 'Sewa',
+        trialBalanceAmount: 5500,
+        adjustmentInfo: 'Sewa bulanan ialah RM 500. Sewa bulan Disember masih belum dibayar.',
+        type: 'ACCRUED_EXP',
+        correctPkkCategory: 'LS',
+        correctPkkAmount: 500, // 1 month
+        correctFinalAmount: 6000
+    },
+    {
+        id: 'acc-l2-4',
+        yearEndDate: '30 Jun 2025',
+        itemLabel: 'Gaji',
+        trialBalanceAmount: 33000,
+        adjustmentInfo: 'Gaji bulan Jun 2025 masih belum dibayar.',
+        type: 'ACCRUED_EXP',
+        correctPkkCategory: 'LS',
+        correctPkkAmount: 3000, // 33000 for 11 months = 3000/mo.
+        correctFinalAmount: 36000
+    },
+    // Kumpulan C: Hasil Belum Terperoleh (Liabiliti Semasa)
+    {
+        id: 'acc-l2-5',
+        yearEndDate: '31 Disember 2024',
+        itemLabel: 'Sewa Diterima',
+        trialBalanceAmount: 13000,
+        adjustmentInfo: 'Sewa diterima adalah untuk tempoh 13 bulan berakhir 31 Januari 2025.',
+        type: 'UNEARNED_REV',
+        correctPkkCategory: 'LS',
+        correctPkkAmount: 1000, // 1 month (Jan 2025)
+        correctFinalAmount: 12000
+    },
+    {
+        id: 'acc-l2-6',
+        yearEndDate: '30 Jun 2025',
+        itemLabel: 'Komisen Diterima',
+        trialBalanceAmount: 4800,
+        adjustmentInfo: 'Komisen tersebut termasuk komisen untuk bulan Julai dan Ogos 2025 berjumlah RM 800.',
+        type: 'UNEARNED_REV',
+        correctPkkCategory: 'LS',
+        correctPkkAmount: 800,
+        correctFinalAmount: 4000
+    },
+    // Kumpulan D: Hasil Belum Terima (Aset Semasa)
+    {
+        id: 'acc-l2-7',
+        yearEndDate: '31 Disember 2024',
+        itemLabel: 'Faedah Simpanan Tetap',
+        trialBalanceAmount: 600,
+        adjustmentInfo: 'Faedah simpanan tetap yang sepatutnya diterima adalah RM 800 setahun.',
+        type: 'ACCRUED_REV',
+        correctPkkCategory: 'AS',
+        correctPkkAmount: 200, // 800 - 600
+        correctFinalAmount: 800
+    },
+    {
+        id: 'acc-l2-8',
+        yearEndDate: '31 Mac 2025',
+        itemLabel: 'Komisen Diterima',
+        trialBalanceAmount: 4400,
+        adjustmentInfo: 'Komisen bulanan ialah RM 400. Komisen bulan Mac 2025 masih belum diterima.',
+        type: 'ACCRUED_REV',
+        correctPkkCategory: 'AS',
+        correctPkkAmount: 400, // 1 month
+        correctFinalAmount: 4800
     }
 ];
 
