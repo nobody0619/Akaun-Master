@@ -634,6 +634,33 @@ export default function App() {
     setCurrentScreen(ScreenState.LEADERBOARD);
   };
 
+  // --- WELCOME SCREEN ---
+  if (currentScreen === ScreenState.WELCOME) {
+      return (
+          <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+              <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center border-t-8 border-blue-600">
+                  <h1 className="text-3xl font-serif font-bold text-slate-800 mb-6">Akaun Master</h1>
+                  <p className="text-slate-600 mb-6">Sila masukkan nama anda untuk memulakan latihan.</p>
+                  <input
+                      type="text"
+                      className="w-full border-2 border-slate-300 rounded-lg p-3 text-lg mb-6 focus:border-blue-600 outline-none transition-colors"
+                      placeholder="Nama Penuh"
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && userName.trim() && setCurrentScreen(ScreenState.MENU)}
+                  />
+                  <Button 
+                      onClick={() => setCurrentScreen(ScreenState.MENU)} 
+                      disabled={!userName.trim()}
+                      className="w-full py-4 text-lg"
+                  >
+                      Mula Latihan
+                  </Button>
+              </div>
+          </div>
+      );
+  }
+
   // --- GENERIC RENDER for PHR/SN/Accruals/Loan/Disposal/TPM needs to show score ---
   if ([ScreenState.DRILL_PHR, ScreenState.DRILL_SN, ScreenState.DRILL_ACCRUALS_L1, ScreenState.DRILL_ACCRUALS_L2, ScreenState.DRILL_LOAN, ScreenState.DRILL_DISPOSAL_L1, ScreenState.DRILL_DISPOSAL_L2, ScreenState.DRILL_TPM, ScreenState.DRILL_BAD_DEBTS].includes(currentScreen)) {
       const getActiveQueue = () => {
