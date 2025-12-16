@@ -9,7 +9,10 @@ export enum ScreenState {
   DRILL_ACCRUALS_L1 = 'DRILL_ACCRUALS_L1',
   DRILL_ACCRUALS_L2 = 'DRILL_ACCRUALS_L2',
   DRILL_BAD_DEBTS = 'DRILL_BAD_DEBTS',
-  DRILL_LOAN = 'DRILL_LOAN'
+  DRILL_LOAN = 'DRILL_LOAN',
+  DRILL_DISPOSAL_L1 = 'DRILL_DISPOSAL_L1',
+  DRILL_DISPOSAL_L2 = 'DRILL_DISPOSAL_L2',
+  DRILL_TPM = 'DRILL_TPM'
 }
 
 export interface GameItem {
@@ -134,5 +137,85 @@ export interface DrillLoanQuestion {
   isNewLoan: boolean; // New Flag
   monthsHeld: number; // New Flag
   
+  isPenalty?: boolean;
+}
+
+export interface DrillDisposalQuestion {
+  id: string;
+  level: 1 | 2;
+  assetName: string;
+  
+  // Trial Balance Info
+  tbTotalCost: number;
+  tbTotalAccDep: number;
+  
+  // Sold Asset Info
+  soldCost: number;
+  soldPurchaseDate: string;
+  
+  method: 'STRAIGHT_LINE' | 'REDUCING_BALANCE';
+  rate: number;
+  
+  financialYearEnd: string;
+  disposalDate: string;
+  monthsHeld: number;
+  
+  disposalValue: number;
+  paymentMode: 'BANK' | 'TUNAI';
+  paymentDescription: string;
+  
+  // Answers
+  // Q1: Belanja SN
+  correctSnExpenseSold: number;
+  correctSnExpenseUnsold: number; // For L2
+
+  // Q2: SNT
+  correctSoldTotalSnt: number;     // SNT of Sold Item (to Disposal)
+  correctUnsoldTotalSnt: number;   // SNT of Unsold Item (Closing Balance) - For L2
+  
+  // Q3: Book Value
+  correctBookValue: number;        
+
+  // Q4: paymentMode (already above)
+  
+  // Q5: Gain/Loss
+  correctGainLossType: 'UNTUNG' | 'RUGI';
+  correctGainLossAmount: number;
+  
+  // Q6: PKK
+  correctFinalAssetCost: number;   
+  correctFinalAccDep: number;
+
+  // Explanations (New)
+  q1Explanation: string;
+  q2Explanation: string;
+  
+  isPenalty?: boolean;
+}
+
+export interface DrillTpmQuestion {
+  id: string;
+  scenarioType: 'TABLE_ZERO' | 'LIST' | 'TABLE_HIGH_LOW';
+  title: string;
+  description: string;
+  
+  // Data Payload depends on type
+  // For List: items array
+  // For Tables: rows array
+  data: any; 
+
+  // Validation
+  ansKosTetap: number;
+  ansKosBerubahSeunit: number;
+  ansMarginCaruman: number;
+  ansTpmUnit: number;
+  ansTpmRm: number;
+  
+  // Question F
+  qfType: 'FIND_UNIT' | 'FIND_PROFIT';
+  qfTargetValue: number; // e.g. RM6500 profit OR 15000 units
+  ansQf: number;
+
+  explanation: string;
   isPenalty?: boolean;
 }

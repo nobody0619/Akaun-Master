@@ -1,4 +1,4 @@
-import { LevelConfig, DropZoneData, DrillQuestion, DrillSnQuestion, DrillAccrualQuestion, DrillBadDebtQuestion, DrillLoanQuestion } from './types';
+import { LevelConfig, DropZoneData, DrillQuestion, DrillSnQuestion, DrillAccrualQuestion, DrillBadDebtQuestion, DrillLoanQuestion, DrillDisposalQuestion, DrillTpmQuestion } from './types';
 
 export const APP_TITLE = "Perniagaan Hakim Berjaya";
 export const HAMIZAH_TITLE = "Perniagaan Hamizah";
@@ -509,5 +509,384 @@ export const generateLoanQuestion = (forceNewLoan: boolean = false): DrillLoanQu
         correctLbs,
         isNewLoan: forceNewLoan,
         monthsHeld
+    };
+};
+
+export const generateDisposalQuestion = (level: 1 | 2): DrillDisposalQuestion => {
+  // Config
+  const currentYear = 2024;
+  const financialYearEnd = `31 Disember ${currentYear}`;
+  const months = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
+  
+  // 1. Assets
+  const assets = ['Perabot', 'Kenderaan', 'Alatan Pejabat', 'Jentera'];
+  const assetName = assets[Math.floor(Math.random() * assets.length)];
+  
+  // 4. Method & Rate (Generate first to ensure clean numbers)
+  const method = Math.random() > 0.5 ? 'STRAIGHT_LINE' : 'REDUCING_BALANCE';
+  const rate = [10, 15, 20][Math.floor(Math.random() * 3)];
+
+  // Helper: Generate Integer-friendly Cost for Straight Line
+  // Cost * Rate% * 1/12 must be an integer.
+  // Strategy: Generate Monthly Dep first (int), then Annual Dep, then Cost.
+  const generateCleanCost = () => {
+      if (method === 'STRAIGHT_LINE') {
+          // Monthly Dep = 50, 100, 150... to ensure it's not too small or weird
+          const monthlyDep = (Math.floor(Math.random() * 5) + 1) * 100; 
+          const annualDep = monthlyDep * 12;
+          // Annual = Cost * Rate/100  -> Cost = Annual / (Rate/100)
+          return Math.round(annualDep / (rate/100));
+      } else {
+          // For Reducing Balance, just use standard rounded thousands, we'll round the result later.
+          return (Math.floor(Math.random() * 4) + 2) * 10000;
+      }
+  }
+
+  // 2. Scenario Costs
+  const costA = generateCleanCost(); // Sold Asset
+  let costB = 0;
+  if (level === 2) {
+    costB = generateCleanCost(); // Unsold Asset
+  }
+  const totalCost = costA + costB;
+
+  // 3. Purchase Date for Unit A (Sold)
+  // Logic: 
+  // Scenario 1: Partial First Year -> Sold on Last Day of Current Year
+  // Scenario 2: Full First Year (1 Jan) -> Sold Partial Year (Mid-Year)
+  
+  const isPurchasePartialYear = Math.random() > 0.5;
+  
+  let purchaseYearA, purchaseMonthAIndex, purchaseDateA, disposalDate, monthsHeldCurrentYear;
+  
+  if (isPurchasePartialYear) {
+      // Bought mid-year 2-3 years ago. Sold 31 Dec 2024.
+      const yearsAgo = Math.floor(Math.random() * 2) + 2; // 2 or 3 years ago
+      purchaseYearA = currentYear - yearsAgo;
+      // Purchase month 1 (Feb) to 11 (Dec) to ensure partial first year
+      purchaseMonthAIndex = Math.floor(Math.random() * 11) + 1; 
+      purchaseDateA = `1 ${months[purchaseMonthAIndex]} ${purchaseYearA}`;
+      
+      disposalDate = `31 Disember ${currentYear}`;
+      monthsHeldCurrentYear = 12;
+  } else {
+      // Bought 1 Jan 2-3 years ago. Sold mid-year 2024.
+      const yearsAgo = Math.floor(Math.random() * 2) + 2;
+      purchaseYearA = currentYear - yearsAgo;
+      purchaseMonthAIndex = 0; // Jan
+      purchaseDateA = `1 Januari ${purchaseYearA}`;
+      
+      const disposalMonthIndex = Math.floor(Math.random() * 10); // Jan - Oct
+      const disposalMonthName = months[disposalMonthIndex];
+      // Determine Day (28, 30, 31)
+      let day = 30;
+      if (["Januari", "Mac", "Mei", "Julai", "Ogos", "Oktober", "Disember"].includes(disposalMonthName)) day = 31;
+      if (disposalMonthName === "Februari") day = 29; // 2024 is leap year
+      disposalDate = `${day} ${disposalMonthName} ${currentYear}`;
+      monthsHeldCurrentYear = disposalMonthIndex + 1;
+  }
+
+  // 5. Calculate SNT (Opening) for Unit A (Sold)
+  // From Purchase Date to 1 Jan 2024 (Start of current year)
+  let sntA_Opening = 0;
+  const monthsFirstYear = 12 - purchaseMonthAIndex; 
+  
+  if (method === 'STRAIGHT_LINE') {
+      const annualDepA = costA * rate / 100;
+      // First Year
+      sntA_Opening += annualDepA * (monthsFirstYear / 12);
+      // Subsequent full years until 2023
+      const fullYears = (currentYear - 1) - purchaseYearA;
+      if (fullYears > 0) {
+        sntA_Opening += annualDepA * fullYears;
+      }
+  } else {
+      // Reducing Balance
+      // Year 1
+      let currentBook = costA;
+      const dep1 = currentBook * (rate/100) * (monthsFirstYear/12);
+      sntA_Opening += dep1;
+      currentBook -= dep1;
+      
+      // Subsequent years
+      const fullYears = (currentYear - 1) - purchaseYearA;
+      for(let i=0; i<fullYears; i++) {
+          const dep = currentBook * (rate/100);
+          sntA_Opening += dep;
+          currentBook -= dep;
+      }
+  }
+  sntA_Opening = Math.round(sntA_Opening);
+  
+  // 6. Calculate SNT (Opening) for Unit B (Unsold) - if exists
+  let sntB_Opening = 0;
+  if (level === 2) {
+      // Just simulate 2 years held for B to get some SNT
+      if (method === 'STRAIGHT_LINE') {
+          sntB_Opening = (costB * rate / 100) * 2;
+      } else {
+          let bVal = costB;
+          let acc = 0;
+          for(let k=0; k<2; k++) {
+              let d = bVal * rate/100;
+              acc += d;
+              bVal -= d;
+          }
+          sntB_Opening = acc;
+      }
+  }
+  sntB_Opening = Math.round(sntB_Opening);
+
+  const totalOpeningSnt = Math.round(sntA_Opening + sntB_Opening);
+
+  // 8. Calculate Current Year Depreciation
+  
+  // A. Sold Unit (A)
+  let snExpenseA = 0;
+  let snExpenseAString = "";
+  if (method === 'STRAIGHT_LINE') {
+      snExpenseA = (costA * rate / 100) * (monthsHeldCurrentYear / 12);
+      snExpenseAString = `RM${costA} x ${rate}% x ${monthsHeldCurrentYear}/12`;
+  } else {
+      // Opening Book Value of A = CostA - sntA_Opening
+      const nbA = costA - sntA_Opening;
+      snExpenseA = nbA * (rate / 100) * (monthsHeldCurrentYear / 12);
+      snExpenseAString = `(RM${costA} - RM${sntA_Opening}) x ${rate}% x ${monthsHeldCurrentYear}/12`;
+  }
+  snExpenseA = Math.round(snExpenseA); 
+
+  // B. Unsold Unit (B) - Full Year
+  let snExpenseB = 0;
+  let snExpenseBString = "";
+  if (level === 2) {
+    if (method === 'STRAIGHT_LINE') {
+        snExpenseB = costB * rate / 100;
+        snExpenseBString = `RM${costB} x ${rate}%`;
+    } else {
+        const nbB = costB - sntB_Opening;
+        snExpenseB = nbB * (rate / 100);
+        snExpenseBString = `(RM${costB} - RM${sntB_Opening}) x ${rate}%`;
+    }
+  }
+  snExpenseB = Math.round(snExpenseB);
+
+  // 9. Total SNT of Sold Unit (Q2 Answer)
+  const totalSntA = Math.round(sntA_Opening + snExpenseA);
+  
+  // SNT of Unsold Unit (Q2 Answer for Level 2)
+  const totalSntB = Math.round(sntB_Opening + snExpenseB);
+
+  // 10. Book Value of Sold Unit (Q3 Answer)
+  const bookValueA = costA - totalSntA;
+
+  // 11. Disposal Price & Gain/Loss (Q5)
+  const isProfit = Math.random() > 0.5;
+  let gainLoss = (Math.floor(Math.random() * 20) + 1) * 100;
+  let disposalValue = 0;
+  
+  if (isProfit) {
+      disposalValue = bookValueA + gainLoss;
+  } else {
+      disposalValue = bookValueA - gainLoss;
+      if (disposalValue < 100) { // Safety
+           disposalValue = 100;
+           gainLoss = bookValueA - disposalValue;
+      }
+  }
+  
+  const paymentMode = Math.random() > 0.5 ? 'BANK' : 'TUNAI';
+  const paymentDescription = paymentMode === 'BANK' ? "Wang dibankkan." : "Diterima secara tunai.";
+
+  // 12. Final PKK Figures (Q6)
+  const correctFinalAssetCost = totalCost - costA; 
+  const correctFinalAccDep = Math.round(totalSntB);
+
+  // 13. Explanations Generation
+  let q1Explanation = "";
+  let q2Explanation = "";
+
+  if (level === 1) {
+      q1Explanation = `Susut Nilai = ${snExpenseAString} = RM${snExpenseA}`;
+      q2Explanation = `SNT = SNT Awal (RM${sntA_Opening}) + SN Semasa (RM${snExpenseA}) = RM${totalSntA}`;
+  } else {
+      q1Explanation = `1. Dijual: ${snExpenseAString} = RM${snExpenseA}\n2. Tidak Dijual: ${snExpenseBString} = RM${snExpenseB}`;
+      q2Explanation = `1. Dijual: ${sntA_Opening} + ${snExpenseA} = RM${totalSntA}\n2. Tidak Dijual: ${sntB_Opening} + ${snExpenseB} = RM${totalSntB}`;
+  }
+
+  return {
+      id: `disp-${Date.now()}-${Math.random()}`,
+      level,
+      assetName,
+      tbTotalCost: totalCost,
+      tbTotalAccDep: totalOpeningSnt,
+      soldCost: costA,
+      soldPurchaseDate: purchaseDateA,
+      method,
+      rate,
+      financialYearEnd,
+      disposalDate,
+      monthsHeld: monthsHeldCurrentYear,
+      disposalValue: Math.round(disposalValue),
+      paymentMode,
+      paymentDescription,
+      correctSnExpenseSold: snExpenseA,
+      correctSnExpenseUnsold: snExpenseB,
+      correctSoldTotalSnt: totalSntA,
+      correctUnsoldTotalSnt: totalSntB,
+      correctBookValue: Math.round(bookValueA),
+      correctGainLossType: isProfit ? 'UNTUNG' : 'RUGI',
+      correctGainLossAmount: Math.round(gainLoss),
+      correctFinalAssetCost,
+      correctFinalAccDep,
+      q1Explanation,
+      q2Explanation
+  };
+};
+
+export const generateTpmQuestion = (): DrillTpmQuestion => {
+    // Determine Scenario Type (Balanced mix is good, or pure random)
+    const types = ['TABLE_ZERO', 'LIST', 'TABLE_HIGH_LOW'] as const;
+    const type = types[Math.floor(Math.random() * types.length)];
+    
+    // Core Numbers
+    // Margin Caruman should be simple: 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0
+    const margin = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 4.0, 5.0][Math.floor(Math.random() * 8)];
+    
+    // Variable Cost (clean)
+    const vc = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0][Math.floor(Math.random() * 7)];
+    
+    // Selling Price
+    const sp = vc + margin;
+    
+    // Fixed Cost - Should ensure TPM Unit is Integer
+    // FC = Margin * RandomInteger
+    const tpmUnitTarget = (Math.floor(Math.random() * 40) + 10) * 100; // 1000 to 5000 approx
+    const fc = Math.round(tpmUnitTarget * margin);
+    
+    // Question F: Target Profit Logic
+    const qfType = Math.random() > 0.5 ? 'FIND_UNIT' : 'FIND_PROFIT';
+    let qfTargetValue = 0;
+    let ansQf = 0;
+    
+    if (qfType === 'FIND_UNIT') {
+        // We give Target Profit RM, ask for Units
+        // Unit = (FC + Profit) / Margin
+        // We want Unit to be Integer. So (FC + Profit) must be divisible by Margin.
+        // Since FC is divisible by Margin, Profit must also be divisible by Margin.
+        const extraUnits = (Math.floor(Math.random() * 20) + 5) * 100;
+        const targetProfit = Math.round(extraUnits * margin);
+        
+        qfTargetValue = targetProfit;
+        ansQf = tpmUnitTarget + extraUnits;
+    } else {
+        // We give Target Units, ask for Profit RM
+        // Profit = (Units * Margin) - FC
+        const targetUnits = tpmUnitTarget + (Math.floor(Math.random() * 10) + 5) * 100;
+        qfTargetValue = targetUnits;
+        ansQf = (targetUnits * margin) - fc;
+    }
+
+    // --- Scenario Generation ---
+    let title = "";
+    let description = "";
+    let data: any = null;
+    
+    const businesses = ["Kilang Kasut Ayra", "Rosmah Bakery", "Perniagaan Teratak Deco", "Perniagaan Titisan Segar", "Marissa Belacan"];
+    const businessName = businesses[Math.floor(Math.random() * businesses.length)];
+    title = businessName;
+
+    if (type === 'TABLE_ZERO') {
+        description = "Jadual berikut menunjukkan anggaran jumlah kos dan jumlah hasil pada pelbagai peringkat keluaran.";
+        // Create 3 rows
+        data = [
+            { unit: 0, cost: fc, revenue: 0 },
+            { unit: 1000, cost: fc + (vc * 1000), revenue: sp * 1000 },
+            { unit: 2000, cost: fc + (vc * 2000), revenue: sp * 2000 },
+            { unit: 3000, cost: fc + (vc * 3000), revenue: sp * 3000 }
+        ];
+    } else if (type === 'LIST') {
+        description = "Anggaran kos pengeluaran produk berkenaan adalah seperti berikut:";
+        // Split FC and VC into sub-items
+        const fc1 = Math.round(fc * 0.6);
+        const fc2 = fc - fc1;
+        const vc1 = Number((vc * 0.6).toFixed(2));
+        const vc2 = Number((vc - vc1).toFixed(2));
+        
+        data = [
+            { label: "Sewa Kilang", val: fc1, isUnit: false },
+            { label: "Gaji Pengurus", val: fc2, isUnit: false },
+            { label: "Bahan Mentah", val: vc1, isUnit: true },
+            { label: "Upah Langsung", val: vc2, isUnit: true },
+            { label: "Harga Jualan", val: sp, isUnit: true, isPrice: true }
+        ];
+    } else if (type === 'TABLE_HIGH_LOW') {
+        description = "Jadual berikut menunjukkan jumlah kos dan jumlah hasil perniagaannya pada pelbagai paras keluaran.";
+        // Create 2 rows sufficiently apart
+        const u1 = 2000;
+        const u2 = 4000;
+        data = [
+            { unit: u1, cost: fc + (vc * u1), revenue: sp * u1 },
+            { unit: u2, cost: fc + (vc * u2), revenue: sp * u2 },
+        ];
+    }
+
+    // Explanation
+    let expScenario = "";
+    if (type === 'TABLE_ZERO') {
+        expScenario = `
+        a) Kos Tetap = Kos pada 0 unit = RM${fc}.
+        b) Kos Berubah seunit = (Kos pada 1000 unit - Kos Tetap) / 1000
+           = (RM${fc + vc*1000} - RM${fc}) / 1000 = RM${vc.toFixed(2)}.
+        `;
+    } else if (type === 'LIST') {
+        expScenario = `
+        a) Kos Tetap = Jumlahkan kos tetap (bukan seunit) = RM${fc}.
+        b) Kos Berubah seunit = Jumlahkan kos berubah seunit = RM${vc.toFixed(2)}.
+        `;
+    } else {
+        expScenario = `
+        b) Kos Berubah seunit (Kaedah Tinggi-Rendah):
+           = (Perubahan Kos) / (Perubahan Unit)
+           = (RM${fc + vc*4000} - RM${fc + vc*2000}) / (4000 - 2000)
+           = RM${vc.toFixed(2)}.
+        a) Kos Tetap = Jumlah Kos - (Kos Berubah seunit x Unit)
+           = RM${fc + vc*2000} - (RM${vc.toFixed(2)} x 2000) = RM${fc}.
+        `;
+    }
+
+    const qfExplanation = qfType === 'FIND_UNIT' 
+        ? `f) Unit Sasaran = (Kos Tetap + Untung Sasaran) / Margin Caruman
+           = (RM${fc} + RM${qfTargetValue}) / RM${margin.toFixed(2)}
+           = ${ansQf} unit.`
+        : `f) Untung Sasaran = (Unit Sasaran x Margin Caruman) - Kos Tetap
+           = (${qfTargetValue} x RM${margin.toFixed(2)}) - RM${fc}
+           = RM${ansQf}.`;
+
+    const explanation = `
+    ${expScenario}
+    c) Margin Caruman = Harga Jualan - Kos Berubah
+       = RM${sp.toFixed(2)} - RM${vc.toFixed(2)} = RM${margin.toFixed(2)}.
+    d) TPM (Unit) = Kos Tetap / Margin Caruman
+       = RM${fc} / RM${margin.toFixed(2)} = ${Math.round(fc/margin)} unit.
+    e) TPM (RM) = TPM Unit x Harga Jualan
+       = ${Math.round(fc/margin)} x RM${sp.toFixed(2)} = RM${(Math.round(fc/margin)*sp).toFixed(2)}.
+    ${qfExplanation}
+    `;
+
+    return {
+        id: `tpm-${Date.now()}-${Math.random()}`,
+        scenarioType: type,
+        title,
+        description,
+        data,
+        ansKosTetap: fc,
+        ansKosBerubahSeunit: vc,
+        ansMarginCaruman: margin,
+        ansTpmUnit: Math.round(fc/margin),
+        ansTpmRm: Math.round(fc/margin) * sp,
+        qfType,
+        qfTargetValue,
+        ansQf,
+        explanation
     };
 };
