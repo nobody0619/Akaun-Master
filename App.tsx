@@ -21,7 +21,7 @@ const BrandLockup = () => (
     <span className="brand-symbol">A</span>
     <span>
       <span className="brand-name block">Akaun Master</span>
-      <span className="brand-caption block">会计学习空间</span>
+      <span className="brand-caption block">Latihan Perakaunan</span>
     </span>
   </div>
 );
@@ -63,17 +63,17 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
 
   const levels = ['ALL', '1', 'DRILL-PHR', 'DRILL-SN', 'DRILL-ACC-L1', 'DRILL-ACC-L2', 'DRILL-HL', 'DRILL-LOAN', 'DRILL-DISP-L1', 'DRILL-DISP-L2', 'DRILL-TPM'];
   const levelLabels: Record<string, string> = {
-    ALL: '全部练习',
-    '1': '贸易账户',
-    'DRILL-PHR': '呆账准备（PHR）',
-    'DRILL-SN': '折旧（SN）',
-    'DRILL-ACC-L1': '基础调整',
-    'DRILL-ACC-L2': '期间调整',
-    'DRILL-HL': '坏账',
-    'DRILL-LOAN': '借款',
-    'DRILL-DISP-L1': '资产处置·基础',
-    'DRILL-DISP-L2': '资产处置·进阶',
-    'DRILL-TPM': '盈亏平衡（TPM）',
+    ALL: 'Semua Latihan',
+    '1': 'Akaun Perdagangan',
+    'DRILL-PHR': 'Peruntukan Hutang Ragu',
+    'DRILL-SN': 'Susut Nilai',
+    'DRILL-ACC-L1': 'Pelarasan Asas',
+    'DRILL-ACC-L2': 'Pelarasan Bertempoh',
+    'DRILL-HL': 'Hutang Lapuk',
+    'DRILL-LOAN': 'Pinjaman',
+    'DRILL-DISP-L1': 'Pelupusan Aset · Asas',
+    'DRILL-DISP-L2': 'Pelupusan Aset · Lanjutan',
+    'DRILL-TPM': 'Titik Pulang Modal',
   };
 
   return (
@@ -82,8 +82,8 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
       <div className="max-w-6xl w-full bg-white/90 rounded-[1.5rem] shadow-[0_24px_65px_rgba(23,50,77,0.12)] overflow-hidden border border-slate-200/80 flex flex-col min-h-[72vh]">
         <div className="p-5 sm:p-7 border-b border-slate-200 bg-[#f8faf9] flex flex-col sm:flex-row justify-between gap-5 items-start">
           <div>
-            <span className="eyebrow">学习记录</span>
-            <h2 className="text-3xl text-[#0f2942] font-serif font-normal mt-2 mb-4">练习排行榜</h2>
+            <span className="eyebrow">Prestasi Pembelajaran</span>
+            <h2 className="text-3xl text-[#0f2942] font-serif font-normal mt-2 mb-4">Papan Kedudukan</h2>
             <div className="flex flex-wrap gap-2">
                 {levels.map(l => (
                     <button
@@ -95,7 +95,7 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
                             : 'bg-white border border-slate-300 text-slate-600 hover:bg-slate-100'
                         }`}
                     >
-                        {levelLabels[l] ?? '其他练习'}
+                        {levelLabels[l] ?? 'Latihan Lain'}
                     </button>
                 ))}
             </div>
@@ -112,12 +112,12 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
                 <table className="w-full text-left border-collapse">
                     <thead className="bg-white sticky top-0 shadow-sm z-10 text-xs uppercase text-slate-500 tracking-wider">
                         <tr>
-                            <th className="p-4 border-b">排名</th>
-                            <th className="p-4 border-b">学生</th>
-                            <th className="p-4 border-b">练习</th>
-                            <th className="p-4 border-b text-right">得分</th>
-                            <th className="p-4 border-b text-right">用时</th>
-                            <th className="p-4 border-b text-right">日期</th>
+                            <th className="p-4 border-b">Kedudukan</th>
+                            <th className="p-4 border-b">Pelajar</th>
+                            <th className="p-4 border-b">Latihan</th>
+                            <th className="p-4 border-b text-right">Skor</th>
+                            <th className="p-4 border-b text-right">Masa</th>
+                            <th className="p-4 border-b text-right">Tarikh</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 bg-white">
@@ -127,7 +127,7 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
                                     {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : idx + 1}
                                 </td>
                                 <td className="p-4 font-semibold text-slate-700">{entry.name}</td>
-                                <td className="p-4 text-xs font-mono text-slate-500">{levelLabels[entry.levelId] ?? '其他练习'}</td>
+                                <td className="p-4 text-xs font-mono text-slate-500">{levelLabels[entry.levelId] ?? 'Latihan Lain'}</td>
                                 <td className="p-4 text-right font-bold text-indigo-600 text-lg">{entry.score}</td>
                                 <td className="p-4 text-right font-mono text-slate-600">{formatTime(entry.time)}</td>
                                 <td className="p-4 text-right text-xs text-slate-400">
@@ -677,8 +677,8 @@ export default function App() {
                   <section>
                       <BrandLockup />
                       <div className="mt-12">
-                          <span className="eyebrow">让会计学习更有条理</span>
-                          <h1 className="hero-title">掌握会计知识，<br/><em>一步一步</em>来。</h1>
+                          <span className="eyebrow">Belajar dengan Lebih Teratur</span>
+                          <h1 className="hero-title">Kuasai Perakaunan,<br/><em>Selangkah demi Selangkah</em>.</h1>
                           <p className="hero-copy">
                               通过专题练习、即时反馈与清晰解析，逐步建立扎实的会计基础。
                           </p>
@@ -692,7 +692,7 @@ export default function App() {
 
                   <section className="welcome-panel">
                       <span className="panel-kicker">开始学习</span>
-                      <h2 className="panel-title">欢迎</h2>
+                      <h2 className="panel-title">Selamat Datang</h2>
                       <p className="panel-copy">输入姓名，以便保存练习得分和用时。</p>
                       <label className="field-label" htmlFor="student-name">学生姓名</label>
                       <input
@@ -735,17 +735,17 @@ export default function App() {
       const q = queue[currentDrillIndex] as any; // simplified casting
       const progress = Math.round(((currentDrillIndex + 1) / queue.length) * 100);
       const drillTitles: Partial<Record<ScreenState, string>> = {
-          [ScreenState.DRILL_PHR]: '呆账准备（PHR）',
-          [ScreenState.DRILL_SN]: '折旧（SN）',
-          [ScreenState.DRILL_ACCRUALS_L1]: '基础调整',
-          [ScreenState.DRILL_ACCRUALS_L2]: '期间调整',
-          [ScreenState.DRILL_BAD_DEBTS]: '坏账',
+          [ScreenState.DRILL_PHR]: 'Peruntukan Hutang Ragu',
+          [ScreenState.DRILL_SN]: 'Susut Nilai',
+          [ScreenState.DRILL_ACCRUALS_L1]: 'Pelarasan Asas',
+          [ScreenState.DRILL_ACCRUALS_L2]: 'Pelarasan Bertempoh',
+          [ScreenState.DRILL_BAD_DEBTS]: 'Hutang Lapuk',
           [ScreenState.DRILL_LOAN]: '借款',
-          [ScreenState.DRILL_DISPOSAL_L1]: '资产处置·基础',
-          [ScreenState.DRILL_DISPOSAL_L2]: '资产处置·进阶',
-          [ScreenState.DRILL_TPM]: '盈亏平衡（TPM）',
+          [ScreenState.DRILL_DISPOSAL_L1]: 'Pelupusan Aset · Asas',
+          [ScreenState.DRILL_DISPOSAL_L2]: 'Pelupusan Aset · Lanjutan',
+          [ScreenState.DRILL_TPM]: 'Titik Pulang Modal',
       };
-      const drillTitle = drillTitles[currentScreen] || '专项练习';
+      const drillTitle = drillTitles[currentScreen] || 'Latihan Topikal';
 
       const renderFeedbackInline = () => {
           if (!drillFeedback) return null;
@@ -756,7 +756,7 @@ export default function App() {
                           {drillFeedback.isCorrect ? '✓' : '✗'}
                       </div>
                       <h3 className={`font-bold text-lg ${drillFeedback.isCorrect ? 'text-green-800' : 'text-red-800'}`}>
-                          {drillFeedback.isCorrect ? '回答正确！' : '回答错误'}
+                          {drillFeedback.isCorrect ? 'Jawapan Tepat!' : 'Jawapan Salah'}
                       </h3>
                   </div>
                   <div className="text-slate-700 whitespace-pre-line leading-relaxed mb-4 text-sm font-medium">
@@ -806,7 +806,7 @@ export default function App() {
                   </div>
                   <div className="drill-meta">
                       <div>
-                          <span className="eyebrow">专项练习</span>
+                          <span className="eyebrow">Latihan Topikal</span>
                           <h1>{drillTitle}</h1>
                       </div>
                       <div className="flex items-center gap-3">
@@ -926,7 +926,7 @@ export default function App() {
                             <>
                                 {/* Content for PHR */}
                                 <div className="mb-8">
-                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">练习题</h3>
+                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">Soalan Peruntukan Hutang Ragu</h3>
                                     <div className="question-ledger ledger-orange mb-4 font-mono text-sm">
                                         <div className="flex justify-between mb-2">
                                             <span>Akaun Belum Terima</span>
@@ -978,7 +978,7 @@ export default function App() {
                         {currentScreen === ScreenState.DRILL_SN && (
                              <>
                                 <div className="mb-8">
-                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">折旧练习题</h3>
+                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">Soalan Susut Nilai</h3>
                                     <div className="question-ledger ledger-blue mb-4 font-mono text-sm">
                                         <div className="flex justify-between mb-2">
                                             <span className="font-bold">{q.assetName} (Kos)</span>
@@ -1031,7 +1031,7 @@ export default function App() {
                         {(currentScreen === ScreenState.DRILL_ACCRUALS_L1 || currentScreen === ScreenState.DRILL_ACCRUALS_L2) && (
                             <>
                                 <div className="mb-8">
-                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">{q.title || 'Soalan'} (Level {currentScreen === ScreenState.DRILL_ACCRUALS_L1 ? '1' : '2'})</h3>
+                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">{q.title || 'Soalan'} (Tahap {currentScreen === ScreenState.DRILL_ACCRUALS_L1 ? '1' : '2'})</h3>
                                     <div className="question-ledger ledger-purple mb-4 font-mono text-sm">
                                         <div className="flex justify-between mb-2">
                                             <span>{q.itemLabel} (Imbangan Duga)</span>
@@ -1301,7 +1301,7 @@ export default function App() {
   if (currentScreen === ScreenState.GAME) {
     return (
         <div className="min-h-screen p-4 flex flex-col items-center justify-center bg-slate-50">
-            <h1 className="text-2xl font-bold mb-4">第 {selectedLevelId} 关</h1>
+            <h1 className="text-2xl font-bold mb-4">Tahap {selectedLevelId}</h1>
             <p className="mb-8 text-slate-600">拖放练习暂未开放。</p>
             <div className="flex gap-4">
                 <Button onClick={() => handleGameWin(selectedLevelId)}>模拟完成</Button>
@@ -1313,15 +1313,15 @@ export default function App() {
 
   // --- MENU ---
   const topics = [
-      { code: 'PHR', title: '呆账准备', description: '练习计算 PHR，并判断它对损益的影响。', accent: 'topic-orange', action: initializeDrillPhr },
-      { code: 'SN', title: '折旧', description: '练习直线法与余额递减法。', accent: 'topic-blue', action: initializeDrillSn },
-      { code: 'P1', title: '基础调整', description: '辨认预付、应计项目并计算调整后金额。', accent: 'topic-purple', action: initializeDrillAccrualsL1 },
-      { code: 'P2', title: '期间调整', description: '练习涉及月份与会计期间的调整。', accent: 'topic-purple', action: initializeDrillAccrualsL2 },
-      { code: 'HL', title: '坏账', description: '区分坏账与坏账收回。', accent: 'topic-red', action: initializeDrillBadDebts },
-      { code: 'PJ', title: '借款', description: '练习利息、调整，以及流动负债的划分。', accent: 'topic-green', action: initializeDrillLoans },
-      { code: 'A1', title: '资产处置·基础', description: '从折旧计算到处置损益。', accent: 'topic-gold', action: () => initializeDrillDisposal(1) },
-      { code: 'A2', title: '资产处置·进阶', description: '同时处理已出售与仍持有的资产。', accent: 'topic-gold', action: () => initializeDrillDisposal(2) },
-      { code: 'TPM', title: '盈亏平衡', description: '练习固定成本、边际贡献与目标利润。', accent: 'topic-blue', action: initializeDrillTpm },
+      { code: 'PHR', title: 'Peruntukan Hutang Ragu', description: '练习计算 PHR，并判断它对损益的影响。', accent: 'topic-orange', action: initializeDrillPhr },
+      { code: 'SN', title: 'Susut Nilai', description: '练习直线法与余额递减法。', accent: 'topic-blue', action: initializeDrillSn },
+      { code: 'P1', title: 'Pelarasan Asas', description: '辨认预付、应计项目并计算调整后金额。', accent: 'topic-purple', action: initializeDrillAccrualsL1 },
+      { code: 'P2', title: 'Pelarasan Bertempoh', description: '练习涉及月份与会计期间的调整。', accent: 'topic-purple', action: initializeDrillAccrualsL2 },
+      { code: 'HL', title: 'Hutang Lapuk', description: '区分坏账与坏账收回。', accent: 'topic-red', action: initializeDrillBadDebts },
+      { code: 'PJ', title: 'Pinjaman', description: '练习利息、调整，以及流动负债的划分。', accent: 'topic-green', action: initializeDrillLoans },
+      { code: 'A1', title: 'Pelupusan Aset · Asas', description: '从折旧计算到处置损益。', accent: 'topic-gold', action: () => initializeDrillDisposal(1) },
+      { code: 'A2', title: 'Pelupusan Aset · Lanjutan', description: '同时处理已出售与仍持有的资产。', accent: 'topic-gold', action: () => initializeDrillDisposal(2) },
+      { code: 'TPM', title: 'Titik Pulang Modal', description: '练习固定成本、边际贡献与目标利润。', accent: 'topic-blue', action: initializeDrillTpm },
   ];
 
   return (
@@ -1337,8 +1337,8 @@ export default function App() {
 
             <section className="menu-hero">
                 <div className="relative z-10">
-                    <span className="text-[.7rem] uppercase tracking-[.18em] font-extrabold text-[#7fd0c2]">你的学习空间</span>
-                    <h1>练习让理解<br/>一步步更扎实。</h1>
+                    <span className="text-[.7rem] uppercase tracking-[.18em] font-extrabold text-[#7fd0c2]">Ruang Latihan Anda</span>
+                    <h1>Bina Keyakinan<br/>Melalui Latihan.</h1>
                     <p>选择一个主题，按步骤作答，并在每题后查看解析。每次错题，都是巩固知识的机会。</p>
                 </div>
                 <div className="hero-stat-grid">
@@ -1352,8 +1352,8 @@ export default function App() {
             <section aria-labelledby="topics-title">
                 <div className="section-heading">
                     <div>
-                        <span className="eyebrow">练习题库</span>
-                        <h2 id="topics-title">选择主题，开始练习</h2>
+                        <span className="eyebrow">Koleksi Latihan</span>
+                        <h2 id="topics-title">Pilih Topik untuk Bermula</h2>
                     </div>
                     <p>每次练习都会生成新的题目顺序，并在作答后提供逐步解析。</p>
                 </div>
@@ -1371,7 +1371,7 @@ export default function App() {
 
             <section className="leaderboard-cta">
                 <div>
-                    <h3>查看学习进度</h3>
+                    <h3>Lihat Perkembangan Pembelajaran</h3>
                     <p>比较各主题的练习得分与用时。</p>
                 </div>
                 <Button onClick={() => setCurrentScreen(ScreenState.LEADERBOARD)} variant="secondary">查看排行榜</Button>

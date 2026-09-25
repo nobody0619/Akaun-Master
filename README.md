@@ -1,8 +1,8 @@
-# Akaun Master 会计练习
+# Akaun Master — Latihan Perakaunan
 
 Akaun Master 是一个会计互动练习平台。界面使用中文，题目、会计术语与解题说明保留马来文，涵盖 PHR、折旧、调整、坏账、借款、资产处置及盈亏平衡等主题。
 
-## 本地运行
+## Jalankan Secara Tempatan
 
 需要 Node.js 20 或更新版本。
 
@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-## 发布前检查
+## Semakan Sebelum Penerbitan
 
 ```bash
 npm run audit:questions
