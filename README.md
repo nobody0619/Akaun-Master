@@ -1,20 +1,21 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Akaun Master
 
-# Run and deploy your AI Studio app
+Akaun Master ialah aplikasi latihan perakaunan interaktif untuk topik PHR, susut nilai, pelarasan, hutang lapuk, pinjaman, pelupusan aset dan titik pulang modal.
 
-This contains everything you need to run your app locally.
+## Jalankan secara tempatan
 
-View your app in AI Studio: https://ai.studio/apps/drive/1gzg7eUE2N7BsoV3vNj9rxZ1ERH9Y7U-r
+Keperluan: Node.js 20 atau lebih baharu.
 
-## Run Locally
+```bash
+npm install
+npm run dev
+```
 
-**Prerequisites:**  Node.js
+## Semakan sebelum penerbitan
 
+```bash
+npm run audit:questions
+npm run build
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Audit soalan menjana 5,000 sampel bagi setiap latihan dinamik dan menyemak formula, kategori, pelarasan, pecahan liabiliti serta kewujudan nilai perpuluhan.

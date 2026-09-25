@@ -1,4 +1,4 @@
-import { LevelConfig, DropZoneData, DrillQuestion, DrillSnQuestion, DrillAccrualQuestion, DrillBadDebtQuestion, DrillLoanQuestion, DrillDisposalQuestion, DrillTpmQuestion } from './types';
+import type { LevelConfig, DropZoneData, DrillQuestion, DrillSnQuestion, DrillAccrualQuestion, DrillBadDebtQuestion, DrillLoanQuestion, DrillDisposalQuestion, DrillTpmQuestion } from './types';
 
 export const APP_TITLE = "Perniagaan Hakim Berjaya";
 export const HAMIZAH_TITLE = "Perniagaan Hamizah";
@@ -10,6 +10,7 @@ const createItem = (label: string, category?: string) => ({ label, category, id:
 const OP_TAMBAH = createItem('Tambah');
 const OP_TOLAK = createItem('Tolak');
 const CAT_BELIAN_ADD = 'BELIAN-ADD';
+const roundCurrency = (value: number) => Math.round((value + Number.EPSILON) * 100) / 100;
 
 // --- LEVEL 1: Akaun Perdagangan ---
 const LEVEL_1_ROWS: DropZoneData[] = [
@@ -57,7 +58,9 @@ export const LEVELS: Record<string, LevelConfig> = {
 export const generatePhrQuestion = (): DrillQuestion => {
     const abt = (Math.floor(Math.random() * 50) + 10) * 1000; // 10k - 60k
     const rate = [2, 3, 4, 5][Math.floor(Math.random() * 4)];
-    const newPhr = abt * (rate / 100);
+    // ABT is generated in RM1,000 steps, so PHR and every adjustment stay in
+    // whole ringgit. Keep the explicit rounding as a guard if the ranges change.
+    const newPhr = Math.round(abt * (rate / 100));
     
     // Scenario: Increase or Decrease
     const isIncrease = Math.random() > 0.5;
@@ -450,7 +453,7 @@ export const generateLoanQuestion = (forceNewLoan: boolean = false): DrillLoanQu
 
     // Interest Expense (Untung Rugi)
     // Formula: Principal * Rate% * (Months / 12)
-    const correctInterestExpense = (principal * rate * monthsHeld) / 1200;
+    const correctInterestExpense = roundCurrency((principal * rate * monthsHeld) / 1200);
 
     // Accrued vs Prepaid Logic
     // Randomize if student faces Accrued (Belum Bayar) or Prepaid (Prabayar)
@@ -475,10 +478,10 @@ export const generateLoanQuestion = (forceNewLoan: boolean = false): DrillLoanQu
     
     // TB Paid Amount based on monthly interest rate
     const monthlyInterest = (principal * rate) / 1200;
-    const tbInterestPaid = monthlyInterest * monthsPaid;
+    const tbInterestPaid = roundCurrency(monthlyInterest * monthsPaid);
     
     // Calculate adjustment amount (Absolute difference)
-    const correctAccruedAmount = Math.abs(correctInterestExpense - tbInterestPaid);
+    const correctAccruedAmount = roundCurrency(Math.abs(correctInterestExpense - tbInterestPaid));
 
     // Liability Split
     let correctLs = yearlyRepayment;

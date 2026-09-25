@@ -11,6 +11,21 @@ const formatTime = (seconds: number) => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
+const formatMoney = (value: number) => new Intl.NumberFormat('ms-MY', {
+  minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
+  maximumFractionDigits: 2,
+}).format(value);
+
+const BrandLockup = () => (
+  <div className="brand-lockup" aria-label="Akaun Master">
+    <span className="brand-symbol">A</span>
+    <span>
+      <span className="brand-name block">Akaun Master</span>
+      <span className="brand-caption block">Studio Pembelajaran</span>
+    </span>
+  </div>
+);
+
 const shuffleArray = <T,>(array: T[]): T[] => {
     return [...array].sort(() => Math.random() - 0.5);
 };
@@ -26,7 +41,7 @@ const preventWheel = (e: React.WheelEvent<HTMLInputElement>) => {
 };
 
 const getCardClass = (isPenalty?: boolean) => {
-    return `bg-white p-6 rounded-lg shadow-xl w-full border-l-8 ${isPenalty ? 'border-red-500' : 'border-indigo-500'} transition-all duration-300`;
+    return `drill-card ${isPenalty ? 'is-penalty' : ''}`;
 };
 
 // -- Leaderboard Component --
@@ -49,11 +64,13 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
   const levels = ['ALL', '1', 'DRILL-PHR', 'DRILL-SN', 'DRILL-ACC-L1', 'DRILL-ACC-L2', 'DRILL-HL', 'DRILL-LOAN', 'DRILL-DISP-L1', 'DRILL-DISP-L2', 'DRILL-TPM'];
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 flex flex-col items-center">
-      <div className="max-w-5xl w-full bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200 flex flex-col h-[85vh]">
-        <div className="p-6 border-b border-slate-200 bg-slate-50 flex justify-between items-start">
+    <div className="app-background min-h-screen p-4 sm:p-8 flex flex-col items-center">
+      <div className="max-w-6xl w-full mb-6"><BrandLockup /></div>
+      <div className="max-w-6xl w-full bg-white/90 rounded-[1.5rem] shadow-[0_24px_65px_rgba(23,50,77,0.12)] overflow-hidden border border-slate-200/80 flex flex-col min-h-[72vh]">
+        <div className="p-5 sm:p-7 border-b border-slate-200 bg-[#f8faf9] flex flex-col sm:flex-row justify-between gap-5 items-start">
           <div>
-            <h2 className="text-2xl font-bold text-slate-800 font-serif mb-4">Leaderboard</h2>
+            <span className="eyebrow">Prestasi</span>
+            <h2 className="text-3xl text-[#0f2942] font-serif font-normal mt-2 mb-4">Papan Kedudukan</h2>
             <div className="flex flex-wrap gap-2">
                 {levels.map(l => (
                     <button
@@ -65,29 +82,29 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
                             : 'bg-white border border-slate-300 text-slate-600 hover:bg-slate-100'
                         }`}
                     >
-                        {l === 'ALL' ? 'All Levels' : l}
+                        {l === 'ALL' ? 'Semua Latihan' : l}
                     </button>
                 ))}
             </div>
           </div>
-          <Button onClick={onBack}>Back to Menu</Button>
+          <Button onClick={onBack} variant="secondary">Kembali ke Menu</Button>
         </div>
 
         <div className="flex-1 overflow-auto bg-slate-50/50">
             {loading ? (
-                <div className="flex items-center justify-center h-full text-slate-500">Loading scores...</div>
+                <div className="flex items-center justify-center h-full text-slate-500">Memuatkan rekod...</div>
             ) : displayScores.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-slate-400 italic">No scores recorded for this level yet.</div>
+                <div className="flex items-center justify-center h-full text-slate-400 italic">Belum ada rekod untuk latihan ini.</div>
             ) : (
                 <table className="w-full text-left border-collapse">
                     <thead className="bg-white sticky top-0 shadow-sm z-10 text-xs uppercase text-slate-500 tracking-wider">
                         <tr>
-                            <th className="p-4 border-b">Rank</th>
-                            <th className="p-4 border-b">Player</th>
-                            <th className="p-4 border-b">Level</th>
-                            <th className="p-4 border-b text-right">Score</th>
-                            <th className="p-4 border-b text-right">Time</th>
-                            <th className="p-4 border-b text-right">Date</th>
+                            <th className="p-4 border-b">Kedudukan</th>
+                            <th className="p-4 border-b">Pelajar</th>
+                            <th className="p-4 border-b">Latihan</th>
+                            <th className="p-4 border-b text-right">Skor</th>
+                            <th className="p-4 border-b text-right">Masa</th>
+                            <th className="p-4 border-b text-right">Tarikh</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 bg-white">
@@ -402,9 +419,9 @@ export default function App() {
          setMistakes(m => m + 1);
          setScore(s => s - 1);
          const explanation = `
-            Pengiraan: ${q.abt} x ${q.rate}% = ${q.correctNewPhr} (PHR Baru). 
-            Pelarasan: ${q.correctNewPhr} - ${q.oldPhr} = ${q.correctNewPhr - q.oldPhr}.
-            Oleh kerana ${q.correctNewPhr - q.oldPhr > 0 ? 'Positif' : 'Negatif'}, ia adalah ${q.correctCategory} sebanyak ${q.correctAdjustmentAmount}.
+            1. PHR baharu: RM${formatMoney(q.abt)} × ${q.rate}% = RM${formatMoney(q.correctNewPhr)}.
+            2. Pelarasan: RM${formatMoney(q.correctNewPhr)} - RM${formatMoney(q.oldPhr)} = ${q.correctNewPhr - q.oldPhr < 0 ? '-' : ''}RM${formatMoney(Math.abs(q.correctNewPhr - q.oldPhr))}.
+            3. PHR ${q.correctNewPhr > q.oldPhr ? 'meningkat, maka peningkatan itu ialah BELANJA' : 'menurun, maka pengurangan itu ialah HASIL'} sebanyak RM${formatMoney(q.correctAdjustmentAmount)}.
          `;
          setDrillFeedback({ isCorrect: false, message: explanation });
          const penaltyQ1 = { ...generatePhrQuestion(), isPenalty: true };
@@ -434,9 +451,9 @@ export default function App() {
           else methodText = `(${q.cost} - ${q.scrapValue}) / ${q.usefulLife}`;
 
           const explanation = `
-             Pengiraan: ${methodText} = ${q.correctSnExpense}.
+             Pengiraan: ${methodText} = RM${formatMoney(q.correctSnExpense)}.
              Kategori sentiasa BELANJA.
-             Terkumpul: ${q.oldAccDep} (Lama) + ${q.correctSnExpense} (Baru) = ${q.correctNewAccDep}.
+             SNT akhir: RM${formatMoney(q.oldAccDep)} + RM${formatMoney(q.correctSnExpense)} = RM${formatMoney(q.correctNewAccDep)}.
           `;
           setDrillFeedback({ isCorrect: false, message: explanation });
           const penaltyQ1 = { ...generateSnQuestion(), isPenalty: true };
@@ -544,12 +561,16 @@ export default function App() {
           const calculationFormula = q.isNewLoan 
              ? `RM${q.principal} x ${q.rate}% x ${q.monthsHeld}/12` 
              : `RM${q.principal} x ${q.rate}%`;
+          const annualRepayment = q.principal / q.durationYears;
+          const currentLiabilityReason = q.tbLoanBalance <= annualRepayment
+              ? `Baki pinjaman RM${formatMoney(q.tbLoanBalance)} lebih rendah daripada ansuran setahun RM${formatMoney(annualRepayment)}. Oleh itu, seluruh baki ialah Liabiliti Semasa: RM${formatMoney(q.correctLs)}.`
+              : `Ansuran setahun = RM${formatMoney(q.principal)} / ${q.durationYears} tahun = RM${formatMoney(q.correctLs)}.`;
           const msg = `
-            1. Faedah (UR): ${calculationFormula} = RM${q.correctInterestExpense}.
+            1. Faedah (UR): ${calculationFormula} = RM${formatMoney(q.correctInterestExpense)}.
             2. Pelarasan Faedah: ${typeReason} -> ${typeName}.
-               Amaun: Beza RM${q.correctInterestExpense} dan RM${q.tbInterestPaid} = RM${q.correctAccruedAmount}.
-            3. Liabiliti Semasa: Bayaran balik setahun = RM${q.principal} / ${q.durationYears} thn = RM${q.correctLs}.
-            4. Liabiliti Bukan Semasa: Baki Pinjaman (RM${q.tbLoanBalance}) - LS (RM${q.correctLs}) = RM${q.correctLbs}.
+               Amaun: Beza RM${formatMoney(q.correctInterestExpense)} dan RM${formatMoney(q.tbInterestPaid)} = RM${formatMoney(q.correctAccruedAmount)}.
+            3. Liabiliti Semasa: ${currentLiabilityReason}
+            4. Liabiliti Bukan Semasa: RM${formatMoney(q.tbLoanBalance)} - RM${formatMoney(q.correctLs)} = RM${formatMoney(q.correctLbs)}.
           `;
           setDrillFeedback({ isCorrect: false, message: msg });
           const penaltyQ1 = { ...generateLoanQuestion(q.isNewLoan), isPenalty: true };
@@ -596,8 +617,9 @@ export default function App() {
             2. Jumlah Susut Nilai Terkumpul:
                ${q.q2Explanation}
             3. Nilai Buku: RM${q.soldCost} - RM${q.correctSoldTotalSnt} = RM${q.correctBookValue}.
-            4. ${q.correctGainLossType}: RM${q.disposalValue} (Harga Jual) vs RM${q.correctBookValue} (Nilai Buku). Beza: RM${q.correctGainLossAmount}.
-            5. PKK (Akhir):
+            4. Kaedah penerimaan: ${q.paymentMode === 'BANK' ? 'Bank — wang dibankkan' : 'Tunai — wang diterima secara tunai'}.
+            5. ${q.correctGainLossType}: RM${q.disposalValue} (Harga Jual) vs RM${q.correctBookValue} (Nilai Buku). Beza: RM${q.correctGainLossAmount}.
+            6. PKK (Akhir):
                Aset: RM${q.tbTotalCost} - RM${q.soldCost} = RM${q.correctFinalAssetCost}.
                SNT: Baki Unit Belum Dijual (SNT Awal + SN Semasa) = RM${q.correctFinalAccDep}.
           `;
@@ -637,26 +659,50 @@ export default function App() {
   // --- WELCOME SCREEN ---
   if (currentScreen === ScreenState.WELCOME) {
       return (
-          <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-              <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full text-center border-t-8 border-blue-600">
-                  <h1 className="text-3xl font-serif font-bold text-slate-800 mb-6">Akaun Master</h1>
-                  <p className="text-slate-600 mb-6">Sila masukkan nama anda untuk memulakan latihan.</p>
-                  <input
-                      type="text"
-                      className="w-full border-2 border-slate-300 rounded-lg p-3 text-lg mb-6 focus:border-blue-600 outline-none transition-colors"
-                      placeholder="Nama Penuh"
-                      value={userName}
-                      onChange={(e) => setUserName(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && userName.trim() && setCurrentScreen(ScreenState.MENU)}
-                  />
-                  <Button 
-                      onClick={() => setCurrentScreen(ScreenState.MENU)} 
-                      disabled={!userName.trim()}
-                      className="w-full py-4 text-lg"
-                  >
-                      Mula Latihan
-                  </Button>
-              </div>
+          <div className="app-background">
+              <main className="welcome-layout">
+                  <section>
+                      <BrandLockup />
+                      <div className="mt-12">
+                          <span className="eyebrow">Belajar dengan lebih teratur</span>
+                          <h1 className="hero-title">Kuasai akaun,<br/><em>satu langkah</em> demi satu.</h1>
+                          <p className="hero-copy">
+                              Latihan topikal yang membina kefahaman melalui soalan berfokus, semakan segera dan penerangan pengiraan yang jelas.
+                          </p>
+                          <div className="feature-strip" aria-label="Ciri utama">
+                              <span className="feature-chip"><span className="feature-dot"/>9 topik utama</span>
+                              <span className="feature-chip"><span className="feature-dot"/>Maklum balas segera</span>
+                              <span className="feature-chip"><span className="feature-dot"/>Rekod prestasi</span>
+                          </div>
+                      </div>
+                  </section>
+
+                  <section className="welcome-panel">
+                      <span className="panel-kicker">Sesi pembelajaran</span>
+                      <h2 className="panel-title">Selamat datang</h2>
+                      <p className="panel-copy">Masukkan nama anda supaya skor dan masa latihan boleh direkodkan.</p>
+                      <label className="field-label" htmlFor="student-name">Nama pelajar</label>
+                      <input
+                          id="student-name"
+                          type="text"
+                          className="premium-input mb-5"
+                          placeholder="Contoh: Nur Aisyah"
+                          value={userName}
+                          autoComplete="name"
+                          autoFocus
+                          onChange={(e) => setUserName(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && userName.trim() && setCurrentScreen(ScreenState.MENU)}
+                      />
+                      <Button 
+                          onClick={() => setCurrentScreen(ScreenState.MENU)} 
+                          disabled={!userName.trim()}
+                          className="w-full py-3.5"
+                      >
+                          Masuk ke ruang latihan <span aria-hidden="true">→</span>
+                      </Button>
+                      <p className="privacy-note"><span aria-hidden="true">●</span> Nama hanya digunakan untuk memaparkan rekod latihan anda.</p>
+                  </section>
+              </main>
           </div>
       );
   }
@@ -674,12 +720,24 @@ export default function App() {
       }
       const queue = getActiveQueue();
       const q = queue[currentDrillIndex] as any; // simplified casting
-      const progress = Math.round(((currentDrillIndex) / queue.length) * 100);
+      const progress = Math.round(((currentDrillIndex + 1) / queue.length) * 100);
+      const drillTitles: Partial<Record<ScreenState, string>> = {
+          [ScreenState.DRILL_PHR]: 'Peruntukan Hutang Ragu',
+          [ScreenState.DRILL_SN]: 'Susut Nilai',
+          [ScreenState.DRILL_ACCRUALS_L1]: 'Pelarasan Asas',
+          [ScreenState.DRILL_ACCRUALS_L2]: 'Pelarasan Bertarikh',
+          [ScreenState.DRILL_BAD_DEBTS]: 'Hutang Lapuk',
+          [ScreenState.DRILL_LOAN]: 'Pinjaman',
+          [ScreenState.DRILL_DISPOSAL_L1]: 'Pelupusan Aset · Asas',
+          [ScreenState.DRILL_DISPOSAL_L2]: 'Pelupusan Aset · Lanjutan',
+          [ScreenState.DRILL_TPM]: 'Titik Pulang Modal',
+      };
+      const drillTitle = drillTitles[currentScreen] || 'Latihan Topikal';
 
       const renderFeedbackInline = () => {
           if (!drillFeedback) return null;
           return (
-              <div className={`mt-6 p-4 rounded-lg border-2 ${drillFeedback.isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'} animate-in fade-in slide-in-from-top-2 duration-300`}>
+              <div className={`feedback-card ${drillFeedback.isCorrect ? 'correct' : 'incorrect'} animate-in fade-in slide-in-from-top-2 duration-300`}>
                   <div className="flex items-center gap-2 mb-2">
                       <div className={`text-xl ${drillFeedback.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
                           {drillFeedback.isCorrect ? '✓' : '✗'}
@@ -724,22 +782,31 @@ export default function App() {
 
       // Helper for render content based on screen...
       return (
-          <div className="min-h-screen bg-slate-100 flex flex-col items-center p-4">
-              <div className="w-full max-w-2xl">
-                  {/* Header */}
-                  <div className="flex justify-between items-center mb-4">
-                      <div className="text-sm font-bold text-slate-600">Question {currentDrillIndex + 1} / {queue.length}</div>
-                      <div className="flex items-center gap-4">
-                          <div className="text-sm font-bold text-indigo-600 bg-indigo-100 px-2 py-1 rounded">Score: {score}</div>
+          <div className="app-background">
+              <div className="drill-shell">
+                  <div className="drill-topbar">
+                      <BrandLockup />
+                      <div className="drill-nav-actions">
+                          <button className="icon-button" onClick={() => setCurrentScreen(ScreenState.MENU)} aria-label="Kembali ke menu" title="Kembali ke menu">←</button>
+                          <div className="score-pill">Skor&nbsp; {score}</div>
+                      </div>
+                  </div>
+                  <div className="drill-meta">
+                      <div>
+                          <span className="eyebrow">Latihan Topikal</span>
+                          <h1>{drillTitle}</h1>
+                      </div>
+                      <div className="flex items-center gap-3">
+                          <div className="drill-counter">Soalan {currentDrillIndex + 1} / {queue.length}</div>
                           {q.isPenalty && (
                               <span className="bg-red-500 text-white text-[10px] uppercase font-bold px-2 py-1 rounded animate-pulse">
-                                  ⚠️ Ulangkaji (Penalty)
+                                  Ulang kaji
                               </span>
                           )}
                       </div>
                   </div>
-                  <div className="w-full bg-slate-300 h-2 rounded-full mb-6">
-                      <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{width: `${progress}%`}}></div>
+                  <div className="progress-track" aria-label={`Kemajuan ${progress}%`}>
+                      <div className="progress-fill" style={{width: `${progress}%`}}></div>
                   </div>
 
                   {/* Question Card */}
@@ -749,12 +816,12 @@ export default function App() {
                         
                         {currentScreen === ScreenState.DRILL_TPM && (
                             <>
-                                <div className="mb-6 font-serif">
+                                <div className="mb-6">
                                     <h3 className="text-lg font-bold border-b border-black inline-block mb-4">{q.title}</h3>
                                     <p className="text-sm text-slate-600 mb-2">{q.description}</p>
                                     
                                     {/* Data Visualization */}
-                                    <div className="bg-yellow-50 p-4 border border-yellow-200 rounded font-mono text-sm overflow-x-auto">
+                                    <div className="question-ledger ledger-amber font-mono text-sm overflow-x-auto">
                                         {q.scenarioType === 'LIST' ? (
                                             <div className="grid grid-cols-2 gap-2 max-w-xs">
                                                 {q.data.map((item: any, idx: number) => (
@@ -833,7 +900,7 @@ export default function App() {
 
                                     {!drillFeedback && (
                                         <div className="pt-2 flex justify-end">
-                                            <Button onClick={handleTpmSubmit} disabled={!tpmA || !tpmB || !tpmC || !tpmD || !tpmE || !tpmF}>Submit Answer</Button>
+                                            <Button onClick={handleTpmSubmit} disabled={!tpmA || !tpmB || !tpmC || !tpmD || !tpmE || !tpmF}>Semak Jawapan</Button>
                                         </div>
                                     )}
                                     {renderFeedbackInline()}
@@ -845,17 +912,17 @@ export default function App() {
                         {currentScreen === ScreenState.DRILL_PHR && (
                             <>
                                 {/* Content for PHR */}
-                                <div className="mb-8 font-serif">
+                                <div className="mb-8">
                                     <h3 className="text-lg font-bold border-b border-black inline-block mb-4">Soalan</h3>
-                                    <div className="bg-orange-50 p-4 border border-orange-200 rounded mb-4 font-mono text-sm">
+                                    <div className="question-ledger ledger-orange mb-4 font-mono text-sm">
                                         <div className="flex justify-between mb-2">
                                             <span>Akaun Belum Terima</span>
-                                            <span className="font-bold">{q.abt}</span>
+                                            <span className="font-bold">RM {formatMoney(q.abt)}</span>
                                         </div>
                                         {q.oldPhr > 0 && (
                                             <div className="flex justify-between text-slate-500">
                                                 <span>Peruntukan Hutang Ragu</span>
-                                                <span>{q.oldPhr}</span>
+                                                <span>RM {formatMoney(q.oldPhr)}</span>
                                             </div>
                                         )}
                                     </div>
@@ -887,7 +954,7 @@ export default function App() {
                                     </div>
                                     {!drillFeedback && (
                                         <div className="pt-6 flex justify-end">
-                                            <Button onClick={handleDrillSubmit} disabled={!drillAnswerPhr || !drillAnswerAmt || !drillPlacedCategory}>Submit Answer</Button>
+                                            <Button onClick={handleDrillSubmit} disabled={!drillAnswerPhr || !drillAnswerAmt || !drillPlacedCategory}>Semak Jawapan</Button>
                                         </div>
                                     )}
                                     {renderFeedbackInline()}
@@ -897,17 +964,17 @@ export default function App() {
 
                         {currentScreen === ScreenState.DRILL_SN && (
                              <>
-                                <div className="mb-8 font-serif">
+                                <div className="mb-8">
                                     <h3 className="text-lg font-bold border-b border-black inline-block mb-4">Soalan Susut Nilai</h3>
-                                    <div className="bg-blue-50 p-4 border border-blue-200 rounded mb-4 font-mono text-sm">
+                                    <div className="question-ledger ledger-blue mb-4 font-mono text-sm">
                                         <div className="flex justify-between mb-2">
                                             <span className="font-bold">{q.assetName} (Kos)</span>
-                                            <span className="font-bold">{q.cost}</span>
+                                            <span className="font-bold">RM {formatMoney(q.cost)}</span>
                                         </div>
                                         {q.oldAccDep > 0 && (
                                             <div className="flex justify-between text-slate-500">
                                                 <span>Susut Nilai Terkumpul {q.assetName}</span>
-                                                <span>{q.oldAccDep}</span>
+                                                <span>RM {formatMoney(q.oldAccDep)}</span>
                                             </div>
                                         )}
                                     </div>
@@ -940,7 +1007,7 @@ export default function App() {
                                     </div>
                                     {!drillFeedback && (
                                         <div className="pt-6 flex justify-end">
-                                            <Button onClick={handleSnSubmit} disabled={!snAnswerExpense || !snAnswerSnt || !snPlacedCategory}>Submit Answer</Button>
+                                            <Button onClick={handleSnSubmit} disabled={!snAnswerExpense || !snAnswerSnt || !snPlacedCategory}>Semak Jawapan</Button>
                                         </div>
                                     )}
                                     {renderFeedbackInline()}
@@ -950,9 +1017,9 @@ export default function App() {
                         
                         {(currentScreen === ScreenState.DRILL_ACCRUALS_L1 || currentScreen === ScreenState.DRILL_ACCRUALS_L2) && (
                             <>
-                                <div className="mb-8 font-serif">
+                                <div className="mb-8">
                                     <h3 className="text-lg font-bold border-b border-black inline-block mb-4">{q.title || 'Soalan'} (Level {currentScreen === ScreenState.DRILL_ACCRUALS_L1 ? '1' : '2'})</h3>
-                                    <div className="bg-purple-50 p-4 border border-purple-200 rounded mb-4 font-mono text-sm">
+                                    <div className="question-ledger ledger-purple mb-4 font-mono text-sm">
                                         <div className="flex justify-between mb-2">
                                             <span>{q.itemLabel} (Imbangan Duga)</span>
                                             <span className="font-bold">RM {q.trialBalanceAmount}</span>
@@ -993,7 +1060,7 @@ export default function App() {
                                     </div>
                                     {!drillFeedback && (
                                         <div className="pt-2 flex justify-end">
-                                            <Button onClick={handleAccrualSubmit} disabled={!accrualTypeSelection || !accrualCategorySelection || !accrualPkkAmount || !accrualFinalAmount}>Submit</Button>
+                                            <Button onClick={handleAccrualSubmit} disabled={!accrualTypeSelection || !accrualCategorySelection || !accrualPkkAmount || !accrualFinalAmount}>Semak Jawapan</Button>
                                         </div>
                                     )}
                                     {renderFeedbackInline()}
@@ -1003,16 +1070,16 @@ export default function App() {
 
                         {currentScreen === ScreenState.DRILL_BAD_DEBTS && (
                             <>
-                                <div className="mb-8 font-serif">
+                                <div className="mb-8">
                                     <h3 className="text-lg font-bold border-b border-black inline-block mb-4">Hutang Lapuk</h3>
-                                    <div className="bg-red-50 p-4 border border-red-200 rounded mb-4 font-mono text-sm space-y-2">
+                                    <div className="question-ledger ledger-red mb-4 font-mono text-sm space-y-2">
                                         <div className="flex justify-between">
                                             <span>Akaun Belum Terima (Asal)</span>
-                                            <span className="font-bold">{q.originalAbt}</span>
+                                            <span className="font-bold">RM {formatMoney(q.originalAbt)}</span>
                                         </div>
                                         <div className="flex justify-between">
                                             <span>Bank (Asal)</span>
-                                            <span className="font-bold">{q.originalBank}</span>
+                                            <span className="font-bold">RM {formatMoney(q.originalBank)}</span>
                                         </div>
                                     </div>
                                     <p className="text-slate-800">
@@ -1058,7 +1125,7 @@ export default function App() {
                                     </div>
                                     {!drillFeedback && (
                                         <div className="pt-2 flex justify-end">
-                                            <Button onClick={handleBadDebtSubmit} disabled={!badDebtTypeSelection || !badDebtCategorySelection || !badDebtUrAmount}>Submit</Button>
+                                            <Button onClick={handleBadDebtSubmit} disabled={!badDebtTypeSelection || !badDebtCategorySelection || !badDebtUrAmount || (badDebtTypeSelection === 'BAD_DEBT' ? !badDebtAbtAmount : !badDebtBankAmount)}>Semak Jawapan</Button>
                                         </div>
                                     )}
                                     {renderFeedbackInline()}
@@ -1068,22 +1135,22 @@ export default function App() {
 
                         {currentScreen === ScreenState.DRILL_LOAN && (
                             <>
-                                <div className="mb-8 font-serif">
+                                <div className="mb-8">
                                     <h3 className="text-lg font-bold border-b border-black inline-block mb-4">Pinjaman</h3>
-                                    <div className="bg-green-50 p-4 border border-green-200 rounded mb-4 font-mono text-sm space-y-1">
+                                    <div className="question-ledger ledger-green mb-4 font-mono text-sm space-y-1">
                                         <div className="font-bold border-b pb-1 mb-1">Imbangan Duga pada {q.yearEndStr}</div>
                                         <div className="flex justify-between">
                                             <span>Pinjaman {q.rate}%</span>
-                                            <span className="font-bold">{q.tbLoanBalance}</span>
+                                            <span className="font-bold">RM {formatMoney(q.tbLoanBalance)}</span>
                                         </div>
                                         <div className="flex justify-between text-slate-600">
                                             <span>Faedah Pinjaman</span>
-                                            <span>{q.tbInterestPaid}</span>
+                                            <span>RM {formatMoney(q.tbInterestPaid)}</span>
                                         </div>
                                     </div>
                                     <p className="text-slate-800 text-sm">
                                         Maklumat Tambahan: <br/>
-                                        Pinjaman RM {q.principal} telah {q.isNewLoan ? 'dibuat' : 'diperoleh'} pada {q.loanDateStr}. Tempoh pinjaman adalah {q.durationYears} tahun.
+                                        Pinjaman RM {formatMoney(q.principal)} telah {q.isNewLoan ? 'dibuat' : 'diperoleh'} pada {q.loanDateStr}. Tempoh pinjaman ialah {q.durationYears} tahun dan tarikh matang ialah {q.maturityDateStr}.
                                     </p>
                                 </div>
                                 <div className="space-y-4">
@@ -1109,7 +1176,7 @@ export default function App() {
                                     </div>
                                     {!drillFeedback && (
                                         <div className="pt-2 flex justify-end">
-                                            <Button onClick={handleLoanSubmit}>Submit</Button>
+                                            <Button onClick={handleLoanSubmit} disabled={!loanInterestAmount || !loanAdjustmentType || !loanAccruedAmount || !loanLsAmount || !loanLbsAmount}>Semak Jawapan</Button>
                                         </div>
                                     )}
                                     {renderFeedbackInline()}
@@ -1119,9 +1186,9 @@ export default function App() {
 
                         {(currentScreen === ScreenState.DRILL_DISPOSAL_L1 || currentScreen === ScreenState.DRILL_DISPOSAL_L2) && (
                             <>
-                                <div className="mb-6 font-serif">
+                                <div className="mb-6">
                                     <h3 className="text-lg font-bold border-b border-black inline-block mb-2">Pelupusan Aset</h3>
-                                    <div className="bg-yellow-50 p-3 border border-yellow-200 rounded mb-2 font-mono text-xs">
+                                    <div className="question-ledger ledger-amber mb-3 font-mono text-xs">
                                         <div className="font-bold mb-1">Imbangan Duga ({q.financialYearEnd}):</div>
                                         <div className="flex justify-between"><span>{q.assetName} (Kos)</span> <span>{q.tbTotalCost}</span></div>
                                         <div className="flex justify-between"><span>SNT {q.assetName}</span> <span>{q.tbTotalAccDep}</span></div>
@@ -1194,7 +1261,7 @@ export default function App() {
                                     </div>
                                     {!drillFeedback && (
                                         <div className="pt-2 flex justify-end">
-                                            <Button onClick={handleDisposalSubmit}>Submit</Button>
+                                            <Button onClick={handleDisposalSubmit} disabled={!disposalSnExpense || !disposalTotalSnt || !disposalBookValue || !disposalModeSelection || !disposalGainLossType || !disposalGainLossAmount || !disposalFinalCost || !disposalFinalSnt || (currentScreen === ScreenState.DRILL_DISPOSAL_L2 && (!disposalSnExpenseUnsold || !disposalTotalSntUnsold))}>Semak Jawapan</Button>
                                         </div>
                                     )}
                                     {renderFeedbackInline()}
@@ -1204,8 +1271,8 @@ export default function App() {
 
                   </div>
 
-                  <div className="mt-8">
-                      <Button variant="secondary" onClick={() => setCurrentScreen(ScreenState.MENU)}>Keluar Latihan</Button>
+                  <div className="mt-6 text-center">
+                      <button className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors" onClick={() => setCurrentScreen(ScreenState.MENU)}>Keluar daripada latihan</button>
                   </div>
               </div>
           </div>
@@ -1225,35 +1292,78 @@ export default function App() {
             <p className="mb-8 text-slate-600">Drag and Drop Game Implementation Hidden.</p>
             <div className="flex gap-4">
                 <Button onClick={() => handleGameWin(selectedLevelId)}>Win Game (Simulate)</Button>
-                <Button onClick={() => setCurrentScreen(ScreenState.MENU)} variant="secondary">Back to Menu</Button>
+                <Button onClick={() => setCurrentScreen(ScreenState.MENU)} variant="secondary">Kembali ke Menu</Button>
             </div>
         </div>
     );
   }
 
   // --- MENU ---
-  return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-        <h1 className="text-4xl font-serif font-bold mb-8 text-blue-900">Akaun Master</h1>
-        
-        <div className="bg-white p-8 rounded-xl shadow-xl border border-slate-200 w-full max-w-4xl">
-            <h2 className="text-xl font-bold mb-4 text-slate-700 border-b pb-2">Latihan Topikal (Drilling)</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-8">
-                 <Button onClick={initializeDrillPhr} className="text-xs h-auto py-3">PHR</Button>
-                 <Button onClick={initializeDrillSn} className="text-xs h-auto py-3">Susut Nilai</Button>
-                 <Button onClick={initializeDrillAccrualsL1} className="text-xs h-auto py-3">Pelarasan (L1)</Button>
-                 <Button onClick={initializeDrillAccrualsL2} className="text-xs h-auto py-3">Pelarasan (L2)</Button>
-                 <Button onClick={initializeDrillBadDebts} className="text-xs h-auto py-3">Hutang Lapuk</Button>
-                 <Button onClick={initializeDrillLoans} className="text-xs h-auto py-3">Pinjaman</Button>
-                 <Button onClick={() => initializeDrillDisposal(1)} className="text-xs h-auto py-3">Pelupusan (L1)</Button>
-                 <Button onClick={() => initializeDrillDisposal(2)} className="text-xs h-auto py-3">Pelupusan (L2)</Button>
-                 <Button onClick={initializeDrillTpm} className="text-xs h-auto py-3">TPM</Button>
-            </div>
-        </div>
+  const topics = [
+      { code: 'PHR', title: 'Peruntukan Hutang Ragu', description: 'Kira PHR baharu dan kesannya terhadap untung rugi.', accent: 'topic-orange', action: initializeDrillPhr },
+      { code: 'SN', title: 'Susut Nilai', description: 'Latih kaedah garis lurus dan baki berkurangan.', accent: 'topic-blue', action: initializeDrillSn },
+      { code: 'P1', title: 'Pelarasan · Asas', description: 'Kenal pasti prabayar, belum bayar dan amaun akhir.', accent: 'topic-purple', action: initializeDrillAccrualsL1 },
+      { code: 'P2', title: 'Pelarasan · Bertarikh', description: 'Selesaikan pelarasan yang melibatkan tempoh dan bulan.', accent: 'topic-purple', action: initializeDrillAccrualsL2 },
+      { code: 'HL', title: 'Hutang Lapuk', description: 'Bezakan hutang lapuk dengan hutang lapuk terpulih.', accent: 'topic-red', action: initializeDrillBadDebts },
+      { code: 'PJ', title: 'Pinjaman', description: 'Faedah, pelarasan serta pecahan liabiliti semasa.', accent: 'topic-green', action: initializeDrillLoans },
+      { code: 'A1', title: 'Pelupusan · Asas', description: 'Daripada susut nilai hingga untung atau rugi pelupusan.', accent: 'topic-gold', action: () => initializeDrillDisposal(1) },
+      { code: 'A2', title: 'Pelupusan · Lanjutan', description: 'Urus aset dijual dan aset yang masih dimiliki serentak.', accent: 'topic-gold', action: () => initializeDrillDisposal(2) },
+      { code: 'TPM', title: 'Titik Pulang Modal', description: 'Kos tetap, margin caruman dan sasaran keuntungan.', accent: 'topic-blue', action: initializeDrillTpm },
+  ];
 
-        <div className="mt-8">
-             <Button onClick={() => setCurrentScreen(ScreenState.LEADERBOARD)} variant="secondary">View Leaderboard</Button>
-        </div>
+  return (
+    <div className="app-background">
+        <main className="menu-shell">
+            <header className="topbar">
+                <BrandLockup />
+                <div className="user-badge">
+                    <span className="hidden sm:block">Hai, {userName}</span>
+                    <span className="user-avatar">{userName.trim().charAt(0).toUpperCase()}</span>
+                </div>
+            </header>
+
+            <section className="menu-hero">
+                <div className="relative z-10">
+                    <span className="text-[.7rem] uppercase tracking-[.18em] font-extrabold text-[#7fd0c2]">Ruang latihan anda</span>
+                    <h1>Bina keyakinan<br/>melalui latihan.</h1>
+                    <p>Pilih satu topik, jawab mengikut langkah dan semak penerangan selepas setiap soalan. Kesilapan akan dijadikan peluang ulang kaji.</p>
+                </div>
+                <div className="hero-stat-grid">
+                    <div className="hero-stat"><strong>9</strong><span>Topik</span></div>
+                    <div className="hero-stat"><strong>∞</strong><span>Set Dinamik</span></div>
+                    <div className="hero-stat"><strong>+2</strong><span>Jawapan Betul</span></div>
+                    <div className="hero-stat"><strong>−1</strong><span>Jawapan Salah</span></div>
+                </div>
+            </section>
+
+            <section aria-labelledby="topics-title">
+                <div className="section-heading">
+                    <div>
+                        <span className="eyebrow">Koleksi latihan</span>
+                        <h2 id="topics-title">Pilih topik untuk bermula</h2>
+                    </div>
+                    <p>Setiap sesi menjana susunan soalan baharu dan memberikan penerangan langkah demi langkah.</p>
+                </div>
+                <div className="topic-grid">
+                    {topics.map((topic) => (
+                        <button key={topic.title} className={`topic-card ${topic.accent}`} onClick={topic.action}>
+                            <span className="topic-icon">{topic.code}</span>
+                            <h3>{topic.title}</h3>
+                            <p>{topic.description}</p>
+                            <span className="topic-link">Mulakan <span aria-hidden="true">→</span></span>
+                        </button>
+                    ))}
+                </div>
+            </section>
+
+            <section className="leaderboard-cta">
+                <div>
+                    <h3>Lihat perkembangan pembelajaran</h3>
+                    <p>Bandingkan skor dan masa bagi setiap topik latihan.</p>
+                </div>
+                <Button onClick={() => setCurrentScreen(ScreenState.LEADERBOARD)} variant="secondary">Papan Kedudukan</Button>
+            </section>
+        </main>
     </div>
   );
 }
