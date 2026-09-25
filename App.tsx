@@ -21,7 +21,7 @@ const BrandLockup = () => (
     <span className="brand-symbol">A</span>
     <span>
       <span className="brand-name block">Akaun Master</span>
-      <span className="brand-caption block">Studio Pembelajaran</span>
+      <span className="brand-caption block">会计学习空间</span>
     </span>
   </div>
 );
@@ -62,6 +62,19 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
     .sort((a, b) => b.score - a.score || a.time - b.time);
 
   const levels = ['ALL', '1', 'DRILL-PHR', 'DRILL-SN', 'DRILL-ACC-L1', 'DRILL-ACC-L2', 'DRILL-HL', 'DRILL-LOAN', 'DRILL-DISP-L1', 'DRILL-DISP-L2', 'DRILL-TPM'];
+  const levelLabels: Record<string, string> = {
+    ALL: '全部练习',
+    '1': '贸易账户',
+    'DRILL-PHR': '呆账准备（PHR）',
+    'DRILL-SN': '折旧（SN）',
+    'DRILL-ACC-L1': '基础调整',
+    'DRILL-ACC-L2': '期间调整',
+    'DRILL-HL': '坏账',
+    'DRILL-LOAN': '借款',
+    'DRILL-DISP-L1': '资产处置·基础',
+    'DRILL-DISP-L2': '资产处置·进阶',
+    'DRILL-TPM': '盈亏平衡（TPM）',
+  };
 
   return (
     <div className="app-background min-h-screen p-4 sm:p-8 flex flex-col items-center">
@@ -69,8 +82,8 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
       <div className="max-w-6xl w-full bg-white/90 rounded-[1.5rem] shadow-[0_24px_65px_rgba(23,50,77,0.12)] overflow-hidden border border-slate-200/80 flex flex-col min-h-[72vh]">
         <div className="p-5 sm:p-7 border-b border-slate-200 bg-[#f8faf9] flex flex-col sm:flex-row justify-between gap-5 items-start">
           <div>
-            <span className="eyebrow">Prestasi</span>
-            <h2 className="text-3xl text-[#0f2942] font-serif font-normal mt-2 mb-4">Papan Kedudukan</h2>
+            <span className="eyebrow">学习记录</span>
+            <h2 className="text-3xl text-[#0f2942] font-serif font-normal mt-2 mb-4">练习排行榜</h2>
             <div className="flex flex-wrap gap-2">
                 {levels.map(l => (
                     <button
@@ -82,29 +95,29 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
                             : 'bg-white border border-slate-300 text-slate-600 hover:bg-slate-100'
                         }`}
                     >
-                        {l === 'ALL' ? 'Semua Latihan' : l}
+                        {levelLabels[l] ?? '其他练习'}
                     </button>
                 ))}
             </div>
           </div>
-          <Button onClick={onBack} variant="secondary">Kembali ke Menu</Button>
+          <Button onClick={onBack} variant="secondary">返回主页</Button>
         </div>
 
         <div className="flex-1 overflow-auto bg-slate-50/50">
             {loading ? (
-                <div className="flex items-center justify-center h-full text-slate-500">Memuatkan rekod...</div>
+                <div className="flex items-center justify-center h-full text-slate-500">正在加载记录…</div>
             ) : displayScores.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-slate-400 italic">Belum ada rekod untuk latihan ini.</div>
+                <div className="flex items-center justify-center h-full text-slate-400 italic">这个练习还没有记录。</div>
             ) : (
                 <table className="w-full text-left border-collapse">
                     <thead className="bg-white sticky top-0 shadow-sm z-10 text-xs uppercase text-slate-500 tracking-wider">
                         <tr>
-                            <th className="p-4 border-b">Kedudukan</th>
-                            <th className="p-4 border-b">Pelajar</th>
-                            <th className="p-4 border-b">Latihan</th>
-                            <th className="p-4 border-b text-right">Skor</th>
-                            <th className="p-4 border-b text-right">Masa</th>
-                            <th className="p-4 border-b text-right">Tarikh</th>
+                            <th className="p-4 border-b">排名</th>
+                            <th className="p-4 border-b">学生</th>
+                            <th className="p-4 border-b">练习</th>
+                            <th className="p-4 border-b text-right">得分</th>
+                            <th className="p-4 border-b text-right">用时</th>
+                            <th className="p-4 border-b text-right">日期</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 bg-white">
@@ -114,11 +127,11 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
                                     {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : idx + 1}
                                 </td>
                                 <td className="p-4 font-semibold text-slate-700">{entry.name}</td>
-                                <td className="p-4 text-xs font-mono text-slate-500">{entry.levelId}</td>
+                                <td className="p-4 text-xs font-mono text-slate-500">{levelLabels[entry.levelId] ?? '其他练习'}</td>
                                 <td className="p-4 text-right font-bold text-indigo-600 text-lg">{entry.score}</td>
                                 <td className="p-4 text-right font-mono text-slate-600">{formatTime(entry.time)}</td>
                                 <td className="p-4 text-right text-xs text-slate-400">
-                                    {new Date(entry.timestamp).toLocaleDateString()}
+                                    {new Date(entry.timestamp).toLocaleDateString('zh-CN')}
                                 </td>
                             </tr>
                         ))}
@@ -390,7 +403,7 @@ export default function App() {
 
       if (isACorrect && isBCorrect && isCCorrect && isDCorrect && isECorrect && isFCorrect) {
           setScore(s => s + (q.isPenalty ? 1 : 2));
-          setDrillFeedback({ isCorrect: true, message: "Tahniah! Semua jawapan anda betul." });
+          setDrillFeedback({ isCorrect: true, message: "做得好，全部答案正确。" });
       } else {
           setMistakes(m => m + 1);
           setScore(s => s - 1);
@@ -414,7 +427,7 @@ export default function App() {
 
      if (isPhrCorrect && isCatCorrect && isAmtCorrect) {
          setScore(s => s + (q.isPenalty ? 1 : 2));
-         setDrillFeedback({ isCorrect: true, message: "Tahniah! Jawapan anda betul." });
+         setDrillFeedback({ isCorrect: true, message: "做得好，答案正确。" });
      } else {
          setMistakes(m => m + 1);
          setScore(s => s - 1);
@@ -441,7 +454,7 @@ export default function App() {
 
       if (isExpCorrect && isCatCorrect && isSntCorrect) {
           setScore(s => s + (q.isPenalty ? 1 : 2));
-          setDrillFeedback({ isCorrect: true, message: "Tahniah! Jawapan anda betul." });
+          setDrillFeedback({ isCorrect: true, message: "做得好，答案正确。" });
       } else {
           setMistakes(m => m + 1);
           setScore(s => s - 1);
@@ -479,7 +492,7 @@ export default function App() {
 
       if (isTypeCorrect && isCategoryCorrect && isPkkAmtCorrect && isFinalAmtCorrect) {
           setScore(s => s + (q.isPenalty ? 1 : 2));
-          setDrillFeedback({ isCorrect: true, message: "Tahniah! Jawapan anda betul." });
+          setDrillFeedback({ isCorrect: true, message: "做得好，答案正确。" });
       } else {
           setMistakes(m => m + 1);
           setScore(s => s - 1);
@@ -518,7 +531,7 @@ export default function App() {
 
     if (isTypeCorrect && isCatCorrect && isUrAmtCorrect && isPkkCorrect) {
         setScore(s => s + (q.isPenalty ? 1 : 2));
-        setDrillFeedback({ isCorrect: true, message: "Tahniah! Jawapan anda betul." });
+        setDrillFeedback({ isCorrect: true, message: "做得好，答案正确。" });
     } else {
         setMistakes(m => m + 1);
         setScore(s => s - 1);
@@ -550,7 +563,7 @@ export default function App() {
       
       if (isExpCorrect && isAdjTypeCorrect && isAdjAmountCorrect && isLsCorrect && isLbsCorrect) {
           setScore(s => s + (q.isPenalty ? 1 : 2));
-          setDrillFeedback({ isCorrect: true, message: "Tahniah! Jawapan anda betul." });
+          setDrillFeedback({ isCorrect: true, message: "做得好，答案正确。" });
       } else {
           setMistakes(m => m + 1);
           setScore(s => s - 1);
@@ -607,7 +620,7 @@ export default function App() {
       
       if (isSnCorrect && isSntCorrect && isBvCorrect && isModeCorrect && isTypeCorrect && isAmountCorrect && isFinalCostCorrect && isFinalSntCorrect && isL2Correct) {
           setScore(s => s + (q.isPenalty ? 1 : 2));
-          setDrillFeedback({ isCorrect: true, message: "Tahniah! Jawapan anda betul." });
+          setDrillFeedback({ isCorrect: true, message: "做得好，答案正确。" });
       } else {
           setMistakes(m => m + 1);
           setScore(s => s - 1);
@@ -664,29 +677,29 @@ export default function App() {
                   <section>
                       <BrandLockup />
                       <div className="mt-12">
-                          <span className="eyebrow">Belajar dengan lebih teratur</span>
-                          <h1 className="hero-title">Kuasai akaun,<br/><em>satu langkah</em> demi satu.</h1>
+                          <span className="eyebrow">让会计学习更有条理</span>
+                          <h1 className="hero-title">掌握会计知识，<br/><em>一步一步</em>来。</h1>
                           <p className="hero-copy">
-                              Latihan topikal yang membina kefahaman melalui soalan berfokus, semakan segera dan penerangan pengiraan yang jelas.
+                              通过专题练习、即时反馈与清晰解析，逐步建立扎实的会计基础。
                           </p>
-                          <div className="feature-strip" aria-label="Ciri utama">
-                              <span className="feature-chip"><span className="feature-dot"/>9 topik utama</span>
-                              <span className="feature-chip"><span className="feature-dot"/>Maklum balas segera</span>
-                              <span className="feature-chip"><span className="feature-dot"/>Rekod prestasi</span>
+                          <div className="feature-strip" aria-label="主要功能">
+                              <span className="feature-chip"><span className="feature-dot"/>9 个练习主题</span>
+                              <span className="feature-chip"><span className="feature-dot"/>即时答题反馈</span>
+                              <span className="feature-chip"><span className="feature-dot"/>练习成绩记录</span>
                           </div>
                       </div>
                   </section>
 
                   <section className="welcome-panel">
-                      <span className="panel-kicker">Sesi pembelajaran</span>
-                      <h2 className="panel-title">Selamat datang</h2>
-                      <p className="panel-copy">Masukkan nama anda supaya skor dan masa latihan boleh direkodkan.</p>
-                      <label className="field-label" htmlFor="student-name">Nama pelajar</label>
+                      <span className="panel-kicker">开始学习</span>
+                      <h2 className="panel-title">欢迎</h2>
+                      <p className="panel-copy">输入姓名，以便保存练习得分和用时。</p>
+                      <label className="field-label" htmlFor="student-name">学生姓名</label>
                       <input
                           id="student-name"
                           type="text"
                           className="premium-input mb-5"
-                          placeholder="Contoh: Nur Aisyah"
+                          placeholder="例如：小明"
                           value={userName}
                           autoComplete="name"
                           autoFocus
@@ -698,9 +711,9 @@ export default function App() {
                           disabled={!userName.trim()}
                           className="w-full py-3.5"
                       >
-                          Masuk ke ruang latihan <span aria-hidden="true">→</span>
+                          进入练习 <span aria-hidden="true">→</span>
                       </Button>
-                      <p className="privacy-note"><span aria-hidden="true">●</span> Nama hanya digunakan untuk memaparkan rekod latihan anda.</p>
+                      <p className="privacy-note"><span aria-hidden="true">●</span> 姓名仅用于显示你的练习记录。</p>
                   </section>
               </main>
           </div>
@@ -722,17 +735,17 @@ export default function App() {
       const q = queue[currentDrillIndex] as any; // simplified casting
       const progress = Math.round(((currentDrillIndex + 1) / queue.length) * 100);
       const drillTitles: Partial<Record<ScreenState, string>> = {
-          [ScreenState.DRILL_PHR]: 'Peruntukan Hutang Ragu',
-          [ScreenState.DRILL_SN]: 'Susut Nilai',
-          [ScreenState.DRILL_ACCRUALS_L1]: 'Pelarasan Asas',
-          [ScreenState.DRILL_ACCRUALS_L2]: 'Pelarasan Bertarikh',
-          [ScreenState.DRILL_BAD_DEBTS]: 'Hutang Lapuk',
-          [ScreenState.DRILL_LOAN]: 'Pinjaman',
-          [ScreenState.DRILL_DISPOSAL_L1]: 'Pelupusan Aset · Asas',
-          [ScreenState.DRILL_DISPOSAL_L2]: 'Pelupusan Aset · Lanjutan',
-          [ScreenState.DRILL_TPM]: 'Titik Pulang Modal',
+          [ScreenState.DRILL_PHR]: '呆账准备（PHR）',
+          [ScreenState.DRILL_SN]: '折旧（SN）',
+          [ScreenState.DRILL_ACCRUALS_L1]: '基础调整',
+          [ScreenState.DRILL_ACCRUALS_L2]: '期间调整',
+          [ScreenState.DRILL_BAD_DEBTS]: '坏账',
+          [ScreenState.DRILL_LOAN]: '借款',
+          [ScreenState.DRILL_DISPOSAL_L1]: '资产处置·基础',
+          [ScreenState.DRILL_DISPOSAL_L2]: '资产处置·进阶',
+          [ScreenState.DRILL_TPM]: '盈亏平衡（TPM）',
       };
-      const drillTitle = drillTitles[currentScreen] || 'Latihan Topikal';
+      const drillTitle = drillTitles[currentScreen] || '专项练习';
 
       const renderFeedbackInline = () => {
           if (!drillFeedback) return null;
@@ -743,7 +756,7 @@ export default function App() {
                           {drillFeedback.isCorrect ? '✓' : '✗'}
                       </div>
                       <h3 className={`font-bold text-lg ${drillFeedback.isCorrect ? 'text-green-800' : 'text-red-800'}`}>
-                          {drillFeedback.isCorrect ? 'Jawapan Tepat!' : 'Jawapan Salah'}
+                          {drillFeedback.isCorrect ? '回答正确！' : '回答错误'}
                       </h3>
                   </div>
                   <div className="text-slate-700 whitespace-pre-line leading-relaxed mb-4 text-sm font-medium">
@@ -774,7 +787,7 @@ export default function App() {
                       }} 
                       className="w-full"
                   >
-                      {currentDrillIndex < queue.length - 1 ? 'Soalan Seterusnya' : 'Tamat Latihan'}
+                      {currentDrillIndex < queue.length - 1 ? '下一题' : '完成练习'}
                   </Button>
               </div>
           );
@@ -787,25 +800,25 @@ export default function App() {
                   <div className="drill-topbar">
                       <BrandLockup />
                       <div className="drill-nav-actions">
-                          <button className="icon-button" onClick={() => setCurrentScreen(ScreenState.MENU)} aria-label="Kembali ke menu" title="Kembali ke menu">←</button>
-                          <div className="score-pill">Skor&nbsp; {score}</div>
+                          <button className="icon-button" onClick={() => setCurrentScreen(ScreenState.MENU)} aria-label="返回主页" title="返回主页">←</button>
+                          <div className="score-pill">得分&nbsp; {score}</div>
                       </div>
                   </div>
                   <div className="drill-meta">
                       <div>
-                          <span className="eyebrow">Latihan Topikal</span>
+                          <span className="eyebrow">专项练习</span>
                           <h1>{drillTitle}</h1>
                       </div>
                       <div className="flex items-center gap-3">
-                          <div className="drill-counter">Soalan {currentDrillIndex + 1} / {queue.length}</div>
+                          <div className="drill-counter">第 {currentDrillIndex + 1} 题 / 共 {queue.length} 题</div>
                           {q.isPenalty && (
                               <span className="bg-red-500 text-white text-[10px] uppercase font-bold px-2 py-1 rounded animate-pulse">
-                                  Ulang kaji
+                                  复习题
                               </span>
                           )}
                       </div>
                   </div>
-                  <div className="progress-track" aria-label={`Kemajuan ${progress}%`}>
+                  <div className="progress-track" aria-label={`练习进度 ${progress}%`}>
                       <div className="progress-fill" style={{width: `${progress}%`}}></div>
                   </div>
 
@@ -892,7 +905,7 @@ export default function App() {
                                             }
                                         </label>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-sm font-bold text-blue-600">Jawapan:</span>
+                                            <span className="text-sm font-bold text-blue-600">答案：</span>
                                             <input type="number" onKeyDown={preventArrowKeys} onWheel={preventWheel} className="border border-blue-300 rounded p-1 w-32 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" value={tpmF} onChange={e=>setTpmF(e.target.value)} disabled={!!drillFeedback} />
                                             <span className="text-xs text-slate-500">{q.qfType === 'FIND_UNIT' ? 'unit' : 'RM'}</span>
                                         </div>
@@ -900,7 +913,7 @@ export default function App() {
 
                                     {!drillFeedback && (
                                         <div className="pt-2 flex justify-end">
-                                            <Button onClick={handleTpmSubmit} disabled={!tpmA || !tpmB || !tpmC || !tpmD || !tpmE || !tpmF}>Semak Jawapan</Button>
+                                            <Button onClick={handleTpmSubmit} disabled={!tpmA || !tpmB || !tpmC || !tpmD || !tpmE || !tpmF}>提交答案</Button>
                                         </div>
                                     )}
                                     {renderFeedbackInline()}
@@ -913,7 +926,7 @@ export default function App() {
                             <>
                                 {/* Content for PHR */}
                                 <div className="mb-8">
-                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">Soalan</h3>
+                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">练习题</h3>
                                     <div className="question-ledger ledger-orange mb-4 font-mono text-sm">
                                         <div className="flex justify-between mb-2">
                                             <span>Akaun Belum Terima</span>
@@ -947,14 +960,14 @@ export default function App() {
                                                 <button onClick={() => setDrillPlacedCategory('HASIL')} className={`px-4 py-2 rounded border font-bold text-sm ${drillPlacedCategory === 'HASIL' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'}`} disabled={!!drillFeedback}>HASIL</button>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <span className="text-sm">Amaun RM</span>
+                                                <span className="text-sm">金额（RM）</span>
                                                 <input type="number" onKeyDown={preventArrowKeys} onWheel={preventWheel} className="border-2 border-slate-300 rounded p-2 font-mono w-24 focus:border-blue-500 outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" value={drillAnswerAmt} onChange={e => setDrillAnswerAmt(e.target.value)} disabled={!!drillFeedback} />
                                             </div>
                                         </div>
                                     </div>
                                     {!drillFeedback && (
                                         <div className="pt-6 flex justify-end">
-                                            <Button onClick={handleDrillSubmit} disabled={!drillAnswerPhr || !drillAnswerAmt || !drillPlacedCategory}>Semak Jawapan</Button>
+                                            <Button onClick={handleDrillSubmit} disabled={!drillAnswerPhr || !drillAnswerAmt || !drillPlacedCategory}>提交答案</Button>
                                         </div>
                                     )}
                                     {renderFeedbackInline()}
@@ -965,7 +978,7 @@ export default function App() {
                         {currentScreen === ScreenState.DRILL_SN && (
                              <>
                                 <div className="mb-8">
-                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">Soalan Susut Nilai</h3>
+                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">折旧练习题</h3>
                                     <div className="question-ledger ledger-blue mb-4 font-mono text-sm">
                                         <div className="flex justify-between mb-2">
                                             <span className="font-bold">{q.assetName} (Kos)</span>
@@ -1007,7 +1020,7 @@ export default function App() {
                                     </div>
                                     {!drillFeedback && (
                                         <div className="pt-6 flex justify-end">
-                                            <Button onClick={handleSnSubmit} disabled={!snAnswerExpense || !snAnswerSnt || !snPlacedCategory}>Semak Jawapan</Button>
+                                            <Button onClick={handleSnSubmit} disabled={!snAnswerExpense || !snAnswerSnt || !snPlacedCategory}>提交答案</Button>
                                         </div>
                                     )}
                                     {renderFeedbackInline()}
@@ -1046,7 +1059,7 @@ export default function App() {
                                                 <button onClick={() => setAccrualCategorySelection('LS')} className={`px-4 py-2 rounded border font-bold text-sm ${accrualCategorySelection === 'LS' ? 'bg-blue-600 text-white' : 'bg-white'}`} disabled={!!drillFeedback}>Liabiliti Semasa</button>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <span className="text-sm">Amaun RM</span>
+                                                <span className="text-sm">金额（RM）</span>
                                                 <input type="number" onKeyDown={preventArrowKeys} onWheel={preventWheel} className="border-2 border-slate-300 rounded p-2 w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" value={accrualPkkAmount} onChange={e => setAccrualPkkAmount(e.target.value)} disabled={!!drillFeedback} />
                                             </div>
                                         </div>
@@ -1060,7 +1073,7 @@ export default function App() {
                                     </div>
                                     {!drillFeedback && (
                                         <div className="pt-2 flex justify-end">
-                                            <Button onClick={handleAccrualSubmit} disabled={!accrualTypeSelection || !accrualCategorySelection || !accrualPkkAmount || !accrualFinalAmount}>Semak Jawapan</Button>
+                                            <Button onClick={handleAccrualSubmit} disabled={!accrualTypeSelection || !accrualCategorySelection || !accrualPkkAmount || !accrualFinalAmount}>提交答案</Button>
                                         </div>
                                     )}
                                     {renderFeedbackInline()}
@@ -1105,7 +1118,7 @@ export default function App() {
                                                 <button onClick={() => setBadDebtCategorySelection('HASIL')} className={`px-4 py-2 rounded border font-bold text-sm ${badDebtCategorySelection === 'HASIL' ? 'bg-blue-600 text-white' : 'bg-white'}`} disabled={!!drillFeedback}>HASIL</button>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <span className="text-sm">Amaun RM</span>
+                                                <span className="text-sm">金额（RM）</span>
                                                 <input type="number" onKeyDown={preventArrowKeys} onWheel={preventWheel} className="border-2 border-slate-300 rounded p-2 w-24 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" value={badDebtUrAmount} onChange={e => setBadDebtUrAmount(e.target.value)} disabled={!!drillFeedback} />
                                             </div>
                                         </div>
@@ -1125,7 +1138,7 @@ export default function App() {
                                     </div>
                                     {!drillFeedback && (
                                         <div className="pt-2 flex justify-end">
-                                            <Button onClick={handleBadDebtSubmit} disabled={!badDebtTypeSelection || !badDebtCategorySelection || !badDebtUrAmount || (badDebtTypeSelection === 'BAD_DEBT' ? !badDebtAbtAmount : !badDebtBankAmount)}>Semak Jawapan</Button>
+                                            <Button onClick={handleBadDebtSubmit} disabled={!badDebtTypeSelection || !badDebtCategorySelection || !badDebtUrAmount || (badDebtTypeSelection === 'BAD_DEBT' ? !badDebtAbtAmount : !badDebtBankAmount)}>提交答案</Button>
                                         </div>
                                     )}
                                     {renderFeedbackInline()}
@@ -1176,7 +1189,7 @@ export default function App() {
                                     </div>
                                     {!drillFeedback && (
                                         <div className="pt-2 flex justify-end">
-                                            <Button onClick={handleLoanSubmit} disabled={!loanInterestAmount || !loanAdjustmentType || !loanAccruedAmount || !loanLsAmount || !loanLbsAmount}>Semak Jawapan</Button>
+                                            <Button onClick={handleLoanSubmit} disabled={!loanInterestAmount || !loanAdjustmentType || !loanAccruedAmount || !loanLsAmount || !loanLbsAmount}>提交答案</Button>
                                         </div>
                                     )}
                                     {renderFeedbackInline()}
@@ -1245,7 +1258,7 @@ export default function App() {
                                         <div className="flex gap-2">
                                             <button onClick={()=>setDisposalGainLossType('UNTUNG')} className={`px-2 py-1 text-xs border rounded ${disposalGainLossType === 'UNTUNG' ? 'bg-green-600 text-white' : 'bg-white'}`} disabled={!!drillFeedback}>Untung</button>
                                             <button onClick={()=>setDisposalGainLossType('RUGI')} className={`px-2 py-1 text-xs border rounded ${disposalGainLossType === 'RUGI' ? 'bg-red-600 text-white' : 'bg-white'}`} disabled={!!drillFeedback}>Rugi</button>
-                                            <input type="number" onKeyDown={preventArrowKeys} onWheel={preventWheel} placeholder="Amaun" className="border border-slate-300 rounded p-1 flex-1 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" value={disposalGainLossAmount} onChange={e => setDisposalGainLossAmount(e.target.value)} disabled={!!drillFeedback} />
+                                            <input type="number" onKeyDown={preventArrowKeys} onWheel={preventWheel} placeholder="金额" className="border border-slate-300 rounded p-1 flex-1 text-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" value={disposalGainLossAmount} onChange={e => setDisposalGainLossAmount(e.target.value)} disabled={!!drillFeedback} />
                                         </div>
                                     </div>
                                     {/* Q6: PKK */}
@@ -1261,7 +1274,7 @@ export default function App() {
                                     </div>
                                     {!drillFeedback && (
                                         <div className="pt-2 flex justify-end">
-                                            <Button onClick={handleDisposalSubmit} disabled={!disposalSnExpense || !disposalTotalSnt || !disposalBookValue || !disposalModeSelection || !disposalGainLossType || !disposalGainLossAmount || !disposalFinalCost || !disposalFinalSnt || (currentScreen === ScreenState.DRILL_DISPOSAL_L2 && (!disposalSnExpenseUnsold || !disposalTotalSntUnsold))}>Semak Jawapan</Button>
+                                            <Button onClick={handleDisposalSubmit} disabled={!disposalSnExpense || !disposalTotalSnt || !disposalBookValue || !disposalModeSelection || !disposalGainLossType || !disposalGainLossAmount || !disposalFinalCost || !disposalFinalSnt || (currentScreen === ScreenState.DRILL_DISPOSAL_L2 && (!disposalSnExpenseUnsold || !disposalTotalSntUnsold))}>提交答案</Button>
                                         </div>
                                     )}
                                     {renderFeedbackInline()}
@@ -1272,7 +1285,7 @@ export default function App() {
                   </div>
 
                   <div className="mt-6 text-center">
-                      <button className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors" onClick={() => setCurrentScreen(ScreenState.MENU)}>Keluar daripada latihan</button>
+                      <button className="text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors" onClick={() => setCurrentScreen(ScreenState.MENU)}>退出练习</button>
                   </div>
               </div>
           </div>
@@ -1288,11 +1301,11 @@ export default function App() {
   if (currentScreen === ScreenState.GAME) {
     return (
         <div className="min-h-screen p-4 flex flex-col items-center justify-center bg-slate-50">
-            <h1 className="text-2xl font-bold mb-4">Game Level {selectedLevelId}</h1>
-            <p className="mb-8 text-slate-600">Drag and Drop Game Implementation Hidden.</p>
+            <h1 className="text-2xl font-bold mb-4">第 {selectedLevelId} 关</h1>
+            <p className="mb-8 text-slate-600">拖放练习暂未开放。</p>
             <div className="flex gap-4">
-                <Button onClick={() => handleGameWin(selectedLevelId)}>Win Game (Simulate)</Button>
-                <Button onClick={() => setCurrentScreen(ScreenState.MENU)} variant="secondary">Kembali ke Menu</Button>
+                <Button onClick={() => handleGameWin(selectedLevelId)}>模拟完成</Button>
+                <Button onClick={() => setCurrentScreen(ScreenState.MENU)} variant="secondary">返回主页</Button>
             </div>
         </div>
     );
@@ -1300,15 +1313,15 @@ export default function App() {
 
   // --- MENU ---
   const topics = [
-      { code: 'PHR', title: 'Peruntukan Hutang Ragu', description: 'Kira PHR baharu dan kesannya terhadap untung rugi.', accent: 'topic-orange', action: initializeDrillPhr },
-      { code: 'SN', title: 'Susut Nilai', description: 'Latih kaedah garis lurus dan baki berkurangan.', accent: 'topic-blue', action: initializeDrillSn },
-      { code: 'P1', title: 'Pelarasan · Asas', description: 'Kenal pasti prabayar, belum bayar dan amaun akhir.', accent: 'topic-purple', action: initializeDrillAccrualsL1 },
-      { code: 'P2', title: 'Pelarasan · Bertarikh', description: 'Selesaikan pelarasan yang melibatkan tempoh dan bulan.', accent: 'topic-purple', action: initializeDrillAccrualsL2 },
-      { code: 'HL', title: 'Hutang Lapuk', description: 'Bezakan hutang lapuk dengan hutang lapuk terpulih.', accent: 'topic-red', action: initializeDrillBadDebts },
-      { code: 'PJ', title: 'Pinjaman', description: 'Faedah, pelarasan serta pecahan liabiliti semasa.', accent: 'topic-green', action: initializeDrillLoans },
-      { code: 'A1', title: 'Pelupusan · Asas', description: 'Daripada susut nilai hingga untung atau rugi pelupusan.', accent: 'topic-gold', action: () => initializeDrillDisposal(1) },
-      { code: 'A2', title: 'Pelupusan · Lanjutan', description: 'Urus aset dijual dan aset yang masih dimiliki serentak.', accent: 'topic-gold', action: () => initializeDrillDisposal(2) },
-      { code: 'TPM', title: 'Titik Pulang Modal', description: 'Kos tetap, margin caruman dan sasaran keuntungan.', accent: 'topic-blue', action: initializeDrillTpm },
+      { code: 'PHR', title: '呆账准备', description: '练习计算 PHR，并判断它对损益的影响。', accent: 'topic-orange', action: initializeDrillPhr },
+      { code: 'SN', title: '折旧', description: '练习直线法与余额递减法。', accent: 'topic-blue', action: initializeDrillSn },
+      { code: 'P1', title: '基础调整', description: '辨认预付、应计项目并计算调整后金额。', accent: 'topic-purple', action: initializeDrillAccrualsL1 },
+      { code: 'P2', title: '期间调整', description: '练习涉及月份与会计期间的调整。', accent: 'topic-purple', action: initializeDrillAccrualsL2 },
+      { code: 'HL', title: '坏账', description: '区分坏账与坏账收回。', accent: 'topic-red', action: initializeDrillBadDebts },
+      { code: 'PJ', title: '借款', description: '练习利息、调整，以及流动负债的划分。', accent: 'topic-green', action: initializeDrillLoans },
+      { code: 'A1', title: '资产处置·基础', description: '从折旧计算到处置损益。', accent: 'topic-gold', action: () => initializeDrillDisposal(1) },
+      { code: 'A2', title: '资产处置·进阶', description: '同时处理已出售与仍持有的资产。', accent: 'topic-gold', action: () => initializeDrillDisposal(2) },
+      { code: 'TPM', title: '盈亏平衡', description: '练习固定成本、边际贡献与目标利润。', accent: 'topic-blue', action: initializeDrillTpm },
   ];
 
   return (
@@ -1317,32 +1330,32 @@ export default function App() {
             <header className="topbar">
                 <BrandLockup />
                 <div className="user-badge">
-                    <span className="hidden sm:block">Hai, {userName}</span>
+                    <span className="hidden sm:block">你好，{userName}</span>
                     <span className="user-avatar">{userName.trim().charAt(0).toUpperCase()}</span>
                 </div>
             </header>
 
             <section className="menu-hero">
                 <div className="relative z-10">
-                    <span className="text-[.7rem] uppercase tracking-[.18em] font-extrabold text-[#7fd0c2]">Ruang latihan anda</span>
-                    <h1>Bina keyakinan<br/>melalui latihan.</h1>
-                    <p>Pilih satu topik, jawab mengikut langkah dan semak penerangan selepas setiap soalan. Kesilapan akan dijadikan peluang ulang kaji.</p>
+                    <span className="text-[.7rem] uppercase tracking-[.18em] font-extrabold text-[#7fd0c2]">你的学习空间</span>
+                    <h1>练习让理解<br/>一步步更扎实。</h1>
+                    <p>选择一个主题，按步骤作答，并在每题后查看解析。每次错题，都是巩固知识的机会。</p>
                 </div>
                 <div className="hero-stat-grid">
-                    <div className="hero-stat"><strong>9</strong><span>Topik</span></div>
-                    <div className="hero-stat"><strong>∞</strong><span>Set Dinamik</span></div>
-                    <div className="hero-stat"><strong>+2</strong><span>Jawapan Betul</span></div>
-                    <div className="hero-stat"><strong>−1</strong><span>Jawapan Salah</span></div>
+                    <div className="hero-stat"><strong>9</strong><span>练习主题</span></div>
+                    <div className="hero-stat"><strong>∞</strong><span>动态题组</span></div>
+                    <div className="hero-stat"><strong>+2</strong><span>答对得分</span></div>
+                    <div className="hero-stat"><strong>−1</strong><span>答错扣分</span></div>
                 </div>
             </section>
 
             <section aria-labelledby="topics-title">
                 <div className="section-heading">
                     <div>
-                        <span className="eyebrow">Koleksi latihan</span>
-                        <h2 id="topics-title">Pilih topik untuk bermula</h2>
+                        <span className="eyebrow">练习题库</span>
+                        <h2 id="topics-title">选择主题，开始练习</h2>
                     </div>
-                    <p>Setiap sesi menjana susunan soalan baharu dan memberikan penerangan langkah demi langkah.</p>
+                    <p>每次练习都会生成新的题目顺序，并在作答后提供逐步解析。</p>
                 </div>
                 <div className="topic-grid">
                     {topics.map((topic) => (
@@ -1350,7 +1363,7 @@ export default function App() {
                             <span className="topic-icon">{topic.code}</span>
                             <h3>{topic.title}</h3>
                             <p>{topic.description}</p>
-                            <span className="topic-link">Mulakan <span aria-hidden="true">→</span></span>
+                            <span className="topic-link">开始练习 <span aria-hidden="true">→</span></span>
                         </button>
                     ))}
                 </div>
@@ -1358,12 +1371,13 @@ export default function App() {
 
             <section className="leaderboard-cta">
                 <div>
-                    <h3>Lihat perkembangan pembelajaran</h3>
-                    <p>Bandingkan skor dan masa bagi setiap topik latihan.</p>
+                    <h3>查看学习进度</h3>
+                    <p>比较各主题的练习得分与用时。</p>
                 </div>
-                <Button onClick={() => setCurrentScreen(ScreenState.LEADERBOARD)} variant="secondary">Papan Kedudukan</Button>
+                <Button onClick={() => setCurrentScreen(ScreenState.LEADERBOARD)} variant="secondary">查看排行榜</Button>
             </section>
         </main>
     </div>
   );
 }
+

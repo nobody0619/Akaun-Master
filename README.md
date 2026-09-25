@@ -1,21 +1,22 @@
-# Akaun Master
+# Akaun Master 会计练习
 
-Akaun Master ialah aplikasi latihan perakaunan interaktif untuk topik PHR, susut nilai, pelarasan, hutang lapuk, pinjaman, pelupusan aset dan titik pulang modal.
+Akaun Master 是一个会计互动练习平台。界面使用中文，题目、会计术语与解题说明保留马来文，涵盖 PHR、折旧、调整、坏账、借款、资产处置及盈亏平衡等主题。
 
-## Jalankan secara tempatan
+## 本地运行
 
-Keperluan: Node.js 20 atau lebih baharu.
+需要 Node.js 20 或更新版本。
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Semakan sebelum penerbitan
+## 发布前检查
 
 ```bash
 npm run audit:questions
 npm run build
 ```
 
-Audit soalan menjana 5,000 sampel bagi setiap latihan dinamik dan menyemak formula, kategori, pelarasan, pecahan liabiliti serta kewujudan nilai perpuluhan.
+题目审计会为每类动态练习生成 5,000 个检查样本，核对计算公式、分类、调整、负债划分及小数情况。提交到 `main` 后，GitHub Actions 会自动构建并发布到 GitHub Pages。
+
