@@ -874,6 +874,14 @@ export const generateTpmQuestion = (): DrillTpmQuestion => {
     e) TPM (RM) = TPM Unit x Harga Jualan
        = ${Math.round(fc/margin)} x RM${sp.toFixed(2)} = RM${(Math.round(fc/margin)*sp).toFixed(2)}.
     ${qfExplanation}
+
+    中文说明：
+    a) 固定成本 Kos Tetap 不随产量变化；题目若给出零产量时的总成本，可直接作为固定成本。高低点法则用总成本变化除以产量变化，求出单位变动成本后再反推固定成本。
+    b) 单位变动成本 Kos Berubah seunit 表示每多生产一单位所增加的成本。清单题把各项单位变动成本相加；表格题按题目数据计算。
+    c) 单位边际贡献 Margin Caruman = 售价 Harga Jualan - 单位变动成本。
+    d) 盈亏平衡点 TPM（单位）= 固定成本 / 单位边际贡献；按题目要求取整为单位数。
+    e) 盈亏平衡销售额 TPM（RM）= 盈亏平衡单位数 × 单位售价。
+    f) 目标产量 =（固定成本 + 目标利润）/ 单位边际贡献；若题目要求目标利润，则目标利润 =（目标销量 × 单位边际贡献）- 固定成本。
     `;
 
     return {
@@ -893,3 +901,4 @@ export const generateTpmQuestion = (): DrillTpmQuestion => {
         explanation
     };
 };
+

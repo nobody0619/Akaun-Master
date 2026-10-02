@@ -435,6 +435,11 @@ export default function App() {
             1. PHR baharu: RM${formatMoney(q.abt)} × ${q.rate}% = RM${formatMoney(q.correctNewPhr)}.
             2. Pelarasan: RM${formatMoney(q.correctNewPhr)} - RM${formatMoney(q.oldPhr)} = ${q.correctNewPhr - q.oldPhr < 0 ? '-' : ''}RM${formatMoney(Math.abs(q.correctNewPhr - q.oldPhr))}.
             3. PHR ${q.correctNewPhr > q.oldPhr ? 'meningkat, maka peningkatan itu ialah BELANJA' : 'menurun, maka pengurangan itu ialah HASIL'} sebanyak RM${formatMoney(q.correctAdjustmentAmount)}.
+
+            中文说明：
+            1. 新的呆账准备 = 应收账款 × PHR 百分比。
+            2. 本期调整 = 新的 PHR - 旧的 PHR；差额的绝对值就是调整金额。
+            3. PHR 增加时，增加额列为 BELANJA（费用）；PHR 减少时，减少额列为 HASIL（收入）。
          `;
          setDrillFeedback({ isCorrect: false, message: explanation });
          const penaltyQ1 = { ...generatePhrQuestion(), isPenalty: true };
@@ -467,6 +472,10 @@ export default function App() {
              Pengiraan: ${methodText} = RM${formatMoney(q.correctSnExpense)}.
              Kategori sentiasa BELANJA.
              SNT akhir: RM${formatMoney(q.oldAccDep)} + RM${formatMoney(q.correctSnExpense)} = RM${formatMoney(q.correctNewAccDep)}.
+
+             中文说明：
+             折旧费用根据题目指定的方法和折旧率计算；直线法按成本计算，余额递减法按未折旧余额计算。
+             折旧属于 BELANJA（费用）。期末累计折旧 SNT = 期初累计折旧 + 本期折旧费用。
           `;
           setDrillFeedback({ isCorrect: false, message: explanation });
           const penaltyQ1 = { ...generateSnQuestion(), isPenalty: true };
@@ -502,9 +511,17 @@ export default function App() {
           if (q.type === 'ACCRUED_REV') typeName = "Hasil Belum Terima";
           if (q.type === 'UNEARNED_REV') typeName = "Hasil Belum Terperoleh";
           let catName = q.correctPkkCategory === 'AS' ? 'Aset Semasa' : 'Liabiliti Semasa';
+          const typeExplanation = q.type === 'PREPAID_EXP'
+              ? '预付费用属于 Aset Semasa（流动资产），期末未使用部分保留为资产，因此从费用余额中扣除。'
+              : q.type === 'ACCRUED_EXP'
+                  ? '应计未付费用属于 Liabiliti Semasa（流动负债），本期费用要加上尚未支付的金额。'
+                  : q.type === 'ACCRUED_REV'
+                      ? '应计未收收入属于 Aset Semasa（流动资产），应把尚未收到的金额加到收入中。'
+                      : '未赚取收入属于 Liabiliti Semasa（流动负债），尚未提供服务的金额应从收入中扣除。';
+          const adjustmentOperator = q.correctFinalAmount > q.trialBalanceAmount ? '+' : '-';
           setDrillFeedback({ 
               isCorrect: false, 
-              message: `Jenis: ${typeName} (${catName})\nAmaun Pelarasan: RM${q.correctPkkAmount}.\nAmaun Akhir: ${q.trialBalanceAmount} ${q.correctFinalAmount > q.trialBalanceAmount ? '+' : '-'} ${q.correctPkkAmount} = RM${q.correctFinalAmount}` 
+              message: `Jenis: ${typeName} (${catName})\nAmaun Pelarasan: RM${q.correctPkkAmount}.\nAmaun Akhir: ${q.trialBalanceAmount} ${adjustmentOperator} ${q.correctPkkAmount} = RM${q.correctFinalAmount}\n\n中文说明：${typeExplanation}\n调整金额为 RM${formatMoney(q.correctPkkAmount)}；最终金额 = 原试算表金额 ${adjustmentOperator} 调整金额 = RM${formatMoney(q.correctFinalAmount)}。` 
           });
           const retry1 = {...q, id: q.id + '-retry1-' + Date.now(), isPenalty: true};
           const retry2 = {...q, id: q.id + '-retry2-' + Date.now(), isPenalty: true};
@@ -537,9 +554,9 @@ export default function App() {
         setScore(s => s - 1);
         let msg = "";
         if (q.type === 'BAD_DEBT') {
-            msg = `Jenis: Hutang Lapuk (Belanja)\nRekod dalam UR: RM${q.amount}\nBaki ABT Baru (PKK) = RM${q.originalAbt} - RM${q.amount} = RM${q.correctNewAbt}`;
+            msg = `Jenis: Hutang Lapuk (Belanja)\nRekod dalam UR: RM${q.amount}\nBaki ABT Baru (PKK) = RM${q.originalAbt} - RM${q.amount} = RM${q.correctNewAbt}\n\n中文说明：坏账（Hutang Lapuk）列为 BELANJA（费用），在 Untung Rugi（损益表）记录坏账金额；应收账款准备 ABT 减少，因此新 ABT = 原 ABT - 坏账金额。`;
         } else {
-            msg = `Jenis: Hutang Lapuk Terpulih (Hasil)\nRekod dalam UR: RM${q.amount}\nBaki Bank Baru (PKK) = RM${q.originalBank} + RM${q.amount} = RM${q.correctNewBank}`;
+            msg = `Jenis: Hutang Lapuk Terpulih (Hasil)\nRekod dalam UR: RM${q.amount}\nBaki Bank Baru (PKK) = RM${q.originalBank} + RM${q.amount} = RM${q.correctNewBank}\n\n中文说明：收回坏账（Hutang Lapuk Terpulih）列为 HASIL（收入），在 Untung Rugi（损益表）记录收回金额；收到款项使银行存款增加，因此新银行余额 = 原银行余额 + 收回金额。`;
         }
         setDrillFeedback({ isCorrect: false, message: msg });
         const penaltyQ1 = { ...generateBadDebtQuestion(), isPenalty: true };
@@ -584,6 +601,12 @@ export default function App() {
                Amaun: Beza RM${formatMoney(q.correctInterestExpense)} dan RM${formatMoney(q.tbInterestPaid)} = RM${formatMoney(q.correctAccruedAmount)}.
             3. Liabiliti Semasa: ${currentLiabilityReason}
             4. Liabiliti Bukan Semasa: RM${formatMoney(q.tbLoanBalance)} - RM${formatMoney(q.correctLs)} = RM${formatMoney(q.correctLbs)}.
+
+            中文说明：
+            1. 损益表中的利息费用按本金、利率和适用期间计算。
+            2. 比较已支付的利息与本期应承担的费用：未付部分是 Faedah Belum Bayar（应计利息），多付部分是 Faedah Prabayar（预付利息）；两者差额为调整金额。
+            3. 一年内应偿还的本金列为 Liabiliti Semasa（流动负债）。
+            4. 非流动负债 = 贷款余额 - 流动负债部分。
           `;
           setDrillFeedback({ isCorrect: false, message: msg });
           const penaltyQ1 = { ...generateLoanQuestion(q.isNewLoan), isPenalty: true };
@@ -635,6 +658,14 @@ export default function App() {
             6. PKK (Akhir):
                Aset: RM${q.tbTotalCost} - RM${q.soldCost} = RM${q.correctFinalAssetCost}.
                SNT: Baki Unit Belum Dijual (SNT Awal + SN Semasa) = RM${q.correctFinalAccDep}.
+
+            中文说明：
+            1. 先计算已出售资产在本期的折旧费用。
+            2. 再计算该资产截至出售日的累计折旧 SNT。
+            3. 账面价值 = 资产成本 - 累计折旧。
+            4. 按题目说明选择 Bank（银行转账）或 Tunai（现金）作为收款方式。
+            5. 比较售价与账面价值：售价较高是处置收益 Untung，较低是处置损失 Rugi；差额为金额。
+            6. 期末资产成本扣除已出售资产成本；期末 SNT 按仍持有资产的累计折旧计算。
           `;
           setDrillFeedback({ isCorrect: false, message: msg });
           const penaltyQ1 = { ...generateDisposalQuestion(q.level), isPenalty: true };
@@ -740,7 +771,7 @@ export default function App() {
           [ScreenState.DRILL_ACCRUALS_L1]: 'Pelarasan Asas',
           [ScreenState.DRILL_ACCRUALS_L2]: 'Pelarasan Bertempoh',
           [ScreenState.DRILL_BAD_DEBTS]: 'Hutang Lapuk',
-          [ScreenState.DRILL_LOAN]: '借款',
+          [ScreenState.DRILL_LOAN]: 'Pinjaman',
           [ScreenState.DRILL_DISPOSAL_L1]: 'Pelupusan Aset · Asas',
           [ScreenState.DRILL_DISPOSAL_L2]: 'Pelupusan Aset · Lanjutan',
           [ScreenState.DRILL_TPM]: 'Titik Pulang Modal',
