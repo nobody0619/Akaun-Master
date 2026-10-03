@@ -23,7 +23,7 @@ const BrandLockup = () => (
     <span className="brand-symbol">A</span>
     <span>
       <span className="brand-name block">Akaun Master</span>
-      <span className="brand-caption block">Latihan Perakaunan</span>
+      <span className="brand-caption block">会计练习平台</span>
     </span>
   </div>
 );
@@ -65,7 +65,7 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
 
   const levels = ['ALL', '1', 'DRILL-PHR', 'DRILL-SN', 'DRILL-ACC-L1', 'DRILL-ACC-L2', 'DRILL-HL', 'DRILL-LOAN', 'DRILL-DISP-L1', 'DRILL-DISP-L2', 'DRILL-TPM', 'DRILL-PARTNERSHIP-INTEREST', 'DRILL-PARTNERSHIP-SALARY', 'DRILL-PROFIT-ADJUSTMENT'];
   const levelLabels: Record<string, string> = {
-    ALL: 'Semua Latihan',
+    ALL: '全部练习',
     '1': 'Akaun Perdagangan',
     'DRILL-PHR': 'Peruntukan Hutang Ragu',
     'DRILL-SN': 'Susut Nilai',
@@ -87,8 +87,8 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
       <div className="max-w-6xl w-full bg-white/90 rounded-[1.5rem] shadow-[0_24px_65px_rgba(23,50,77,0.12)] overflow-hidden border border-slate-200/80 flex flex-col min-h-[72vh]">
         <div className="p-5 sm:p-7 border-b border-slate-200 bg-[#f8faf9] flex flex-col sm:flex-row justify-between gap-5 items-start">
           <div>
-            <span className="eyebrow">Prestasi Pembelajaran</span>
-            <h2 className="text-3xl text-[#0f2942] font-serif font-normal mt-2 mb-4">Papan Kedudukan</h2>
+            <span className="eyebrow">学习记录</span>
+            <h2 className="text-3xl text-[#0f2942] font-serif font-normal mt-2 mb-4">练习排行榜</h2>
             <div className="flex flex-wrap gap-2">
                 {levels.map(l => (
                     <button
@@ -100,7 +100,7 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
                             : 'bg-white border border-slate-300 text-slate-600 hover:bg-slate-100'
                         }`}
                     >
-                        {levelLabels[l] ?? 'Latihan Lain'}
+                        {levelLabels[l] ?? '其他练习'}
                     </button>
                 ))}
             </div>
@@ -117,12 +117,12 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
                 <table className="w-full text-left border-collapse">
                     <thead className="bg-white sticky top-0 shadow-sm z-10 text-xs uppercase text-slate-500 tracking-wider">
                         <tr>
-                            <th className="p-4 border-b">Kedudukan</th>
-                            <th className="p-4 border-b">Pelajar</th>
-                            <th className="p-4 border-b">Latihan</th>
-                            <th className="p-4 border-b text-right">Skor</th>
-                            <th className="p-4 border-b text-right">Masa</th>
-                            <th className="p-4 border-b text-right">Tarikh</th>
+                            <th className="p-4 border-b">排名</th>
+                            <th className="p-4 border-b">学生</th>
+                            <th className="p-4 border-b">练习专题</th>
+                            <th className="p-4 border-b text-right">得分</th>
+                            <th className="p-4 border-b text-right">用时</th>
+                            <th className="p-4 border-b text-right">日期</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 bg-white">
@@ -132,7 +132,7 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
                                     {idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : idx + 1}
                                 </td>
                                 <td className="p-4 font-semibold text-slate-700">{entry.name}</td>
-                                <td className="p-4 text-xs font-mono text-slate-500">{levelLabels[entry.levelId] ?? 'Latihan Lain'}</td>
+                                <td className="p-4 text-xs font-mono text-slate-500">{levelLabels[entry.levelId] ?? '其他练习'}</td>
                                 <td className="p-4 text-right font-bold text-indigo-600 text-lg">{entry.score}</td>
                                 <td className="p-4 text-right font-mono text-slate-600">{formatTime(entry.time)}</td>
                                 <td className="p-4 text-right text-xs text-slate-400">
@@ -713,8 +713,8 @@ export default function App() {
                   <section>
                       <BrandLockup />
                       <div className="mt-12">
-                          <span className="eyebrow">Belajar dengan Lebih Teratur</span>
-                          <h1 className="hero-title">Kuasai Perakaunan,<br/><em>Selangkah demi Selangkah</em>.</h1>
+                          <span className="eyebrow">让会计学习更有条理</span>
+                          <h1 className="hero-title">掌握会计知识，<br/><em>一步一步来。</em></h1>
                           <p className="hero-copy">
                               通过专题练习、即时反馈与清晰解析，逐步建立扎实的会计基础。
                           </p>
@@ -728,7 +728,7 @@ export default function App() {
 
                   <section className="welcome-panel">
                       <span className="panel-kicker">开始学习</span>
-                      <h2 className="panel-title">Selamat Datang</h2>
+                      <h2 className="panel-title">欢迎开始练习</h2>
                       <p className="panel-copy">输入姓名，以便保存练习得分和用时。</p>
                       <label className="field-label" htmlFor="student-name">学生姓名</label>
                       <input
@@ -804,7 +804,7 @@ export default function App() {
           [ScreenState.DRILL_DISPOSAL_L2]: 'Pelupusan Aset · Lanjutan',
           [ScreenState.DRILL_TPM]: 'Titik Pulang Modal',
       };
-      const drillTitle = drillTitles[currentScreen] || 'Latihan Topikal';
+      const drillTitle = drillTitles[currentScreen] || '专题练习';
 
       const renderFeedbackInline = () => {
           if (!drillFeedback) return null;
@@ -815,7 +815,7 @@ export default function App() {
                           {drillFeedback.isCorrect ? '✓' : '✗'}
                       </div>
                       <h3 className={`font-bold text-lg ${drillFeedback.isCorrect ? 'text-green-800' : 'text-red-800'}`}>
-                          {drillFeedback.isCorrect ? 'Jawapan Tepat!' : 'Jawapan Salah'}
+                          {drillFeedback.isCorrect ? '回答正确！' : '回答错误'}
                       </h3>
                   </div>
                   <div className="text-slate-700 whitespace-pre-line leading-relaxed mb-4 text-sm font-medium">
@@ -865,7 +865,7 @@ export default function App() {
                   </div>
                   <div className="drill-meta">
                       <div>
-                          <span className="eyebrow">Latihan Topikal</span>
+                          <span className="eyebrow">专题练习</span>
                           <h1>{drillTitle}</h1>
                       </div>
                       <div className="flex items-center gap-3">
@@ -985,7 +985,7 @@ export default function App() {
                             <>
                                 {/* Content for PHR */}
                                 <div className="mb-8">
-                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">Soalan Peruntukan Hutang Ragu</h3>
+                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">Peruntukan Hutang Ragu</h3>
                                     <div className="question-ledger ledger-orange mb-4 font-mono text-sm">
                                         <div className="flex justify-between mb-2">
                                             <span>Akaun Belum Terima</span>
@@ -999,7 +999,7 @@ export default function App() {
                                         )}
                                     </div>
                                     <p className="text-slate-800">
-                                        Maklumat Tambahan: <br/>
+                                        附加资料： <br/>
                                         Peruntukan hutang ragu diselaraskan <strong>{q.rate}%</strong> atas Akaun Belum Terima bersih.
                                     </p>
                                 </div>
@@ -1037,7 +1037,7 @@ export default function App() {
                         {currentScreen === ScreenState.DRILL_SN && (
                              <>
                                 <div className="mb-8">
-                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">Soalan Susut Nilai</h3>
+                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">Susut Nilai</h3>
                                     <div className="question-ledger ledger-blue mb-4 font-mono text-sm">
                                         <div className="flex justify-between mb-2">
                                             <span className="font-bold">{q.assetName} (Kos)</span>
@@ -1051,7 +1051,7 @@ export default function App() {
                                         )}
                                     </div>
                                     <p className="text-slate-800">
-                                        Maklumat Tambahan: <br/>
+                                        附加资料： <br/>
                                         {q.assetName} disusutnilaikan menggunakan kaedah <strong>{q.methodType === 'STRAIGHT_LINE' ? `Garis Lurus (${q.rate}%)` : q.methodType === 'REDUCING_BALANCE' ? `Baki Berkurangan (${q.rate}%)` : `Nilai Skrap`}</strong>.
                                     </p>
                                 </div>
@@ -1090,14 +1090,14 @@ export default function App() {
                         {(currentScreen === ScreenState.DRILL_ACCRUALS_L1 || currentScreen === ScreenState.DRILL_ACCRUALS_L2) && (
                             <>
                                 <div className="mb-8">
-                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">{q.title || 'Soalan'} (Tahap {currentScreen === ScreenState.DRILL_ACCRUALS_L1 ? '1' : '2'})</h3>
+                                    <h3 className="text-lg font-bold border-b border-black inline-block mb-4">{q.title || '练习题'} · 第 {currentScreen === ScreenState.DRILL_ACCRUALS_L1 ? '1' : '2'} 级</h3>
                                     <div className="question-ledger ledger-purple mb-4 font-mono text-sm">
                                         <div className="flex justify-between mb-2">
                                             <span>{q.itemLabel} (Imbangan Duga)</span>
                                             <span className="font-bold">RM {q.trialBalanceAmount}</span>
                                         </div>
                                         {q.yearEndDate && <div className="text-xs text-slate-500 mb-2">Tahun berakhir: {q.yearEndDate}</div>}
-                                        <p className="text-slate-800 italic mt-2">Maklumat Tambahan: {q.adjustmentInfo}</p>
+                                        <p className="text-slate-800 italic mt-2">附加资料：{q.adjustmentInfo}</p>
                                     </div>
                                 </div>
                                 <div className="space-y-6">
@@ -1221,7 +1221,7 @@ export default function App() {
                                         </div>
                                     </div>
                                     <p className="text-slate-800 text-sm">
-                                        Maklumat Tambahan: <br/>
+                                        附加资料： <br/>
                                         Pinjaman RM {formatMoney(q.principal)} telah {q.isNewLoan ? 'dibuat' : 'diperoleh'} pada {q.loanDateStr}. Tempoh pinjaman ialah {q.durationYears} tahun dan tarikh matang ialah {q.maturityDateStr}.
                                     </p>
                                 </div>
@@ -1360,7 +1360,7 @@ export default function App() {
   if (currentScreen === ScreenState.GAME) {
     return (
         <div className="min-h-screen p-4 flex flex-col items-center justify-center bg-slate-50">
-            <h1 className="text-2xl font-bold mb-4">Tahap {selectedLevelId}</h1>
+            <h1 className="text-2xl font-bold mb-4">第 {selectedLevelId} 关</h1>
             <p className="mb-8 text-slate-600">拖放练习暂未开放。</p>
             <div className="flex gap-4">
                 <Button onClick={() => handleGameWin(selectedLevelId)}>模拟完成</Button>
@@ -1401,8 +1401,8 @@ export default function App() {
 
             <section className="menu-hero">
                 <div className="relative z-10">
-                    <span className="text-[.7rem] uppercase tracking-[.18em] font-extrabold text-[#7fd0c2]">Ruang Latihan Anda</span>
-                    <h1>Bina Keyakinan<br/>Melalui Latihan.</h1>
+                    <span className="text-[.7rem] uppercase tracking-[.18em] font-extrabold text-[#7fd0c2]">你的学习空间</span>
+                    <h1>通过练习，<br/>一步步掌握会计。</h1>
                     <p>选择一个主题，按步骤作答，并在每题后查看解析。每次错题，都是巩固知识的机会。</p>
                 </div>
                 <div className="hero-stat-grid">
@@ -1416,8 +1416,8 @@ export default function App() {
             <section aria-labelledby="topics-title">
                 <div className="section-heading">
                     <div>
-                        <span className="eyebrow">Koleksi Latihan</span>
-                        <h2 id="topics-title">Pilih Topik untuk Bermula</h2>
+                        <span className="eyebrow">专题练习</span>
+                        <h2 id="topics-title">选择主题，开始练习</h2>
                     </div>
                     <p>选择主题，完成练习，并在作答后查看逐步解析。</p>
                 </div>
@@ -1435,7 +1435,7 @@ export default function App() {
 
             <section aria-labelledby="partnership-title">
                 <div className="section-heading">
-                    <div><span className="eyebrow">Latihan Pekongsi</span><h2 id="partnership-title">Perkongsian</h2></div>
+                    <div><span className="eyebrow">合伙专题</span><h2 id="partnership-title">Perkongsian</h2></div>
                     <p>每个专题 10 道固定题，练习账户归类、未付差额与净利润调整。</p>
                 </div>
                 <div className="topic-grid">
@@ -1455,7 +1455,7 @@ export default function App() {
 
             <section className="leaderboard-cta">
                 <div>
-                    <h3>Lihat Perkembangan Pembelajaran</h3>
+                    <h3>查看学习进度</h3>
                     <p>比较各主题的练习得分与用时。</p>
                 </div>
                 <Button onClick={() => setCurrentScreen(ScreenState.LEADERBOARD)} variant="secondary">查看排行榜</Button>

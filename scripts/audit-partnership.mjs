@@ -7,10 +7,9 @@ import { PROFIT_ADJUSTMENT_QUESTIONS, getAdjustedProfit, getProfitAdjustmentDire
 
 // Independent answer keys for the 20 fixed teaching questions.
 const interestAnswers = [
-  [640, 640, 0, 640], [1600, 1600, 0, 600], [480, 480, 0, 230],
-  [4800, 4800, 0, 1200], [2400, 2400, 0, 2400], [900, 900, 0, 0],
-  [800, 800, 0, 300], [1500, 1500, 0, 400], [2000, 2000, 0, 500],
-  [960, 960, 0, 240],
+  [640, 0, 640], [1600, 0, 600], [480, 0, 230],
+  [4800, 0, 1200], [2400, 0, 2400], [900, 0, 0],
+  [800, 0, 300], [400, 0, 300], [1200, 0, 600], [720, 0, 720],
 ];
 const salaryAnswers = [
   [12000, 3000], [18000, 3000], [12000, 2000], [6000, 1000], [6000, 6000],
@@ -27,7 +26,8 @@ const checkTopic = (questions, answerKey) => {
     assert(gradePartnershipAnswers(q, correct).isCorrect, `${q.id}: correct answers should pass`);
     assert(gradePartnershipAnswers(q, Object.fromEntries(fields.map(field => [field.key, `${correct[field.key]}.00`]))).isCorrect);
     for (const field of fields) {
-      assert(!gradePartnershipAnswers(q, { ...correct, [field.key]: '' }).isCorrect, 'Empty must not mean zero');
+      assert.equal(gradePartnershipAnswers(q, { ...correct, [field.key]: '' }).isCorrect, field.expected === 0, 'Empty means zero, not a skipped answer');
+      assert(!gradePartnershipAnswers(q, { ...correct, [field.key]: 'NaN' }).isCorrect);
       assert(!gradePartnershipAnswers(q, { ...correct, [field.key]: String(field.expected + 1) }).isCorrect);
       assert(!gradePartnershipAnswers(q, { ...correct, [field.key]: '-1' }).isCorrect);
     }
@@ -37,15 +37,23 @@ const checkTopic = (questions, answerKey) => {
 };
 checkTopic(PARTNERSHIP_INTEREST_QUESTIONS, interestAnswers);
 checkTopic(PARTNERSHIP_SALARY_QUESTIONS, salaryAnswers);
+assert.equal(PARTNERSHIP_INTEREST_QUESTIONS.filter(q => q.loanStart).length, 3);
+assert.equal(PARTNERSHIP_INTEREST_QUESTIONS.filter(q => !q.loanStart).length, 7);
+for (const q of PARTNERSHIP_INTEREST_QUESTIONS.filter(q => q.loanStart)) {
+  const monthNames = ['Januari', 'Februari', 'Mac', 'April', 'Mei', 'Jun', 'Julai', 'Ogos', 'September', 'Oktober', 'November', 'Disember'];
+  const startMonth = monthNames.indexOf(q.loanStart.split(' ')[1]);
+  assert.equal(q.months, 12 - startMonth);
+  assert(getPartnershipExplanation(q).includes(`× ${q.months}/12`));
+}
 
 assert.equal(new Set([...PARTNERSHIP_INTEREST_QUESTIONS, ...PARTNERSHIP_SALARY_QUESTIONS].map(q => q.id)).size, 20);
 assert.equal(PARTNERSHIP_SALARY_QUESTIONS.filter(q => q.paid === 0).length, 3);
 // Specific student mistakes: interest in appropriation; paid figure as annual
 // expense; full entitlement as the current-account net adjustment.
 const loan = PARTNERSHIP_INTEREST_QUESTIONS[1];
-assert(!gradePartnershipAnswers(loan, { annual: '1600', ur: '1600', appropriation: '1600', current: '600' }).isCorrect);
-assert(!gradePartnershipAnswers(loan, { annual: '1000', ur: '1000', appropriation: '0', current: '600' }).isCorrect);
-assert(!gradePartnershipAnswers(loan, { annual: '1600', ur: '1600', appropriation: '0', current: '1600' }).isCorrect);
+assert(!gradePartnershipAnswers(loan, { ur: '1600', appropriation: '1600', current: '600' }).isCorrect);
+assert(!gradePartnershipAnswers(loan, { ur: '1000', appropriation: '0', current: '600' }).isCorrect);
+assert(!gradePartnershipAnswers(loan, { ur: '1600', appropriation: '0', current: '1600' }).isCorrect);
 const gaji = PARTNERSHIP_SALARY_QUESTIONS[0];
 assert(!gradePartnershipAnswers(gaji, { appropriation: '3000', current: '3000' }).isCorrect);
 assert(!gradePartnershipAnswers(gaji, { appropriation: '12000', current: '12000' }).isCorrect);
@@ -72,7 +80,7 @@ for (const [index, q] of PROFIT_ADJUSTMENT_QUESTIONS.entries()) {
   assert(!gradeProfitAdjustmentAnswers(q, answers, '').isCorrect);
   assert(!gradeProfitAdjustmentAnswers(q, answers, String(key.final + 1)).isCorrect);
   for (const item of q.items) {
-    assert(!gradeProfitAdjustmentAnswers(q, { ...answers, [item.id]: { ...answers[item.id], amount: '' } }, String(key.final)).isCorrect);
+    assert.equal(gradeProfitAdjustmentAnswers(q, { ...answers, [item.id]: { ...answers[item.id], amount: '' } }, String(key.final)).isCorrect, item.amount === 0);
     const wrongDirection = getProfitAdjustmentDirection(item) === 'ADD' ? 'SUBTRACT' : 'ADD';
     assert(!gradeProfitAdjustmentAnswers(q, { ...answers, [item.id]: { ...answers[item.id], direction: wrongDirection } }, String(key.final)).isCorrect);
   }

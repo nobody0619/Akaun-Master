@@ -34,7 +34,7 @@ export const PartnershipDrill: React.FC<Props> = ({ topic, onBack, onComplete })
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (feedback || fields.some(field => !answers[field.key]?.trim())) return;
+    if (feedback) return;
     const result = gradePartnershipAnswers(q, answers);
     setFeedback(result);
     setScore(value => value + (result.isCorrect ? (q.isPenalty ? 1 : 2) : -1));
@@ -60,7 +60,7 @@ export const PartnershipDrill: React.FC<Props> = ({ topic, onBack, onComplete })
         <div className="drill-topbar">
           <div className="brand-lockup" aria-label="Akaun Master">
             <span className="brand-symbol">A</span>
-            <span><span className="brand-name block">Akaun Master</span><span className="brand-caption block">Latihan Perakaunan</span></span>
+            <span><span className="brand-name block">Akaun Master</span><span className="brand-caption block">会计练习平台</span></span>
           </div>
           <div className="drill-nav-actions">
             <button className="icon-button" onClick={onBack} aria-label="返回主页">←</button>
@@ -77,7 +77,6 @@ export const PartnershipDrill: React.FC<Props> = ({ topic, onBack, onComplete })
         <div className="progress-track" aria-label={`练习进度 ${progress}%`}><div className="progress-fill" style={{ width: `${progress}%` }} /></div>
         <article className={`drill-card ${q.isPenalty ? 'is-penalty' : ''}`}>
           <h2 className="text-xl font-bold text-[#0f2942] mb-3">Perkongsian {q.partnership}</h2>
-          <p className="text-sm text-slate-600 mb-4">Maklumat berikut adalah bagi tahun berakhir {q.yearEnd}.</p>
           <div className="question-ledger ledger-purple mb-5">
             <h3 className="text-lg mb-3">Petikan Imbangan Duga pada {q.yearEnd}</h3>
             <table className="w-full text-sm">
@@ -93,23 +92,19 @@ export const PartnershipDrill: React.FC<Props> = ({ topic, onBack, onComplete })
             </table>
           </div>
           <section className="mb-6 text-sm leading-relaxed text-slate-700">
-            <h3 className="text-lg mb-2">Maklumat Tambahan</h3>
-            {topic === 'INTEREST' ? <>
-              <p>Ikatan perjanjian perkongsian menetapkan faedah atas pinjaman {q.partner} pada kadar {q.rate}% setahun. Pinjaman RM{money(q.principal!)} telah wujud sepanjang tahun dan amaunnya tidak berubah.</p>
-              <p className="mt-2">{q.paid === 0 ? 'Tiada faedah atas pinjaman pekongsi telah dibayar atau direkodkan dalam Imbangan Duga.' : 'Faedah dalam Imbangan Duga ialah faedah yang telah dibayar.'} Baki faedah yang belum dibayar hendaklah dikreditkan ke Akaun Semasa {q.partner}.</p>
-            </> : <>
-              <p>Ikatan perjanjian perkongsian memperuntukkan gaji {q.partner} sebanyak RM{money(q.annualEntitlement)} bagi setahun penuh.</p>
-              <p className="mt-2">{q.paid === 0 ? `Tiada gaji ${q.partner} telah dibayar atau direkodkan dalam Imbangan Duga.` : 'Gaji dalam Imbangan Duga ialah gaji pekongsi yang telah dibayar.'} Baki gaji yang belum dibayar hendaklah dikreditkan ke Akaun Semasa {q.partner}.</p>
-            </>}
+            <h3 className="text-lg mb-2">附加资料</h3>
+            {topic === 'INTEREST'
+              ? <><p>Faedah atas pinjaman pada kadar {q.rate}% setahun.</p>{q.loanStart && <p>Pinjaman bermula pada {q.loanStart}.</p>}</>
+              : <p>Gaji {q.partner} RM{money(q.annualEntitlement)} setahun.</p>}
           </section>
           <form onSubmit={submit}>
-            <h3 className="text-lg mb-2">Anda Dikehendaki</h3>
-            <p className="text-sm text-slate-600 mb-4">Nyatakan amaun bagi tahun semasa. Bagi Akaun Semasa, nyatakan pelarasan bersih belum bayar sahaja, bukan baki akhir akaun. Jika tiada catatan, masukkan 0.</p>
+            <h3 className="text-lg mb-2">作答要求</h3>
+            <p className="text-sm text-slate-600 mb-4">填写金额；留空按 0 计算。</p>
             <div className="space-y-4">
               {fields.map((field, number) => <div key={field.key}>
                 <label className="block text-sm font-bold text-slate-700 mb-2" htmlFor={`partnership-${field.key}`}>{number + 1}. {field.label}</label>
                 <div className="flex items-center gap-3"><span className="text-sm text-slate-500">RM</span>
-                  <input id={`partnership-${field.key}`} type="number" min="0" step="0.01" inputMode="decimal" required
+                  <input id={`partnership-${field.key}`} type="number" min="0" step="0.01" inputMode="decimal"
                     className="w-full p-3 text-sm font-mono" value={answers[field.key] ?? ''} disabled={!!feedback}
                     onWheel={event => event.currentTarget.blur()}
                     onKeyDown={event => { if (['ArrowUp', 'ArrowDown'].includes(event.key)) event.preventDefault(); }}
@@ -117,14 +112,14 @@ export const PartnershipDrill: React.FC<Props> = ({ topic, onBack, onComplete })
                 </div>
               </div>)}
             </div>
-            {!feedback && <div className="mt-5 flex justify-end"><Button type="submit" disabled={fields.some(field => !answers[field.key]?.trim())}>提交答案</Button></div>}
+            {!feedback && <div className="mt-5 flex justify-end"><Button type="submit">提交答案</Button></div>}
           </form>
           {feedback && <section className={`feedback-card ${feedback.isCorrect ? 'correct' : 'incorrect'}`} aria-live="polite">
-            <h3 className="text-xl mb-3">{feedback.isCorrect ? 'Jawapan Tepat!' : 'Jawapan Salah'}</h3>
+            <h3 className="text-xl mb-3">{feedback.isCorrect ? '回答正确！' : '回答错误'}</h3>
             <div className="space-y-3 mb-5">
               {feedback.fields.map(field => <div key={field.key} className="border-b border-slate-200 pb-2 text-sm">
                 <p className={`font-bold ${field.correct ? 'text-green-700' : 'text-rose-700'}`}>{field.correct ? '✓' : '✗'} {field.label}</p>
-                <p className="text-slate-600 mt-1">你的答案：RM{field.submitted} · 正确答案：RM{money(field.expected)}</p>
+                <p className="text-slate-600 mt-1">你的答案：RM{field.submitted || '0'} · 正确答案：RM{money(field.expected)}</p>
               </div>)}
             </div>
             <p className="text-sm text-slate-700 whitespace-pre-line leading-relaxed">{getPartnershipExplanation(q)}</p>

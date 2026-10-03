@@ -103,11 +103,12 @@ export const gradeProfitAdjustmentAnswers = (q: ProfitAdjustmentQuestion, answer
   const fields = q.items.map(item => {
     const answer = answers[item.id] ?? {};
     const amount = answer.amount?.trim() ?? '';
-    const value = amount === '' ? NaN : Number(amount);
+    const value = Number(amount || '0');
     return { ...item, direction: rules[item.effect].direction, correct: answer.direction === rules[item.effect].direction && Number.isFinite(value) && value >= 0 && Math.abs(value - item.amount) < 0.005 };
   });
   const expectedProfit = getAdjustedProfit(q);
-  const finalCorrect = finalAnswer.trim() !== '' && Number.isFinite(Number(finalAnswer)) && Math.abs(Number(finalAnswer) - expectedProfit) < 0.005;
+  const finalValue = Number(finalAnswer.trim() || '0');
+  const finalCorrect = Number.isFinite(finalValue) && Math.abs(finalValue - expectedProfit) < 0.005;
   return { fields, expectedProfit, finalCorrect, isCorrect: finalCorrect && fields.every(field => field.correct) };
 };
 

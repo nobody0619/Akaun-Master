@@ -21,7 +21,7 @@ export const ProfitAdjustmentDrill: React.FC<Props> = ({ onBack, onComplete }) =
   const [feedback, setFeedback] = useState<ReturnType<typeof gradeProfitAdjustmentAnswers> | null>(null);
   const q = queue[index];
   const progress = Math.round((index + 1) / queue.length * 100);
-  const incomplete = !finalAnswer.trim() || q.items.some(item => !answers[item.id]?.direction || !answers[item.id]?.amount?.trim());
+  const incomplete = q.items.some(item => !answers[item.id]?.direction);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -52,7 +52,7 @@ export const ProfitAdjustmentDrill: React.FC<Props> = ({ onBack, onComplete }) =
 
   return <div className="app-background"><main className="drill-shell">
     <div className="drill-topbar">
-      <div className="brand-lockup" aria-label="Akaun Master"><span className="brand-symbol">A</span><span><span className="brand-name block">Akaun Master</span><span className="brand-caption block">Latihan Perakaunan</span></span></div>
+      <div className="brand-lockup" aria-label="Akaun Master"><span className="brand-symbol">A</span><span><span className="brand-name block">Akaun Master</span><span className="brand-caption block">会计练习平台</span></span></div>
       <div className="drill-nav-actions"><button className="icon-button" onClick={onBack} aria-label="返回主页">←</button><div className="score-pill">得分 {score}</div></div>
     </div>
     <div className="drill-meta">
@@ -66,23 +66,23 @@ export const ProfitAdjustmentDrill: React.FC<Props> = ({ onBack, onComplete }) =
         <p>Untung bersih bagi tahun berakhir 31 Disember 2024 sebelum pelarasan:</p>
         <p className="font-mono text-2xl font-bold text-[#0f2942] mt-2">RM{money(q.initialProfit)}</p>
       </div>
-      <h3 className="text-lg mb-2">Maklumat Tambahan dan Pelarasan</h3>
-      <p className="text-sm text-slate-600 mb-5">Pilih tindakan terhadap untung bersih dan masukkan amaun pelarasan bagi setiap perkara. Kemudian hitung untung bersih terselaras. Jika tiada pelarasan, masukkan 0.</p>
+      <h3 className="text-lg mb-2">附加资料与调整</h3>
+      <p className="text-sm text-slate-600 mb-5">选择加减方向，填写金额与调整后净利润；金额留空按 0 计算。</p>
       <form onSubmit={submit}>
         <div className="space-y-5">
           {q.items.map((item, number) => <section key={item.id} className="border border-slate-200 rounded-xl p-4">
             <h4 className="font-bold text-sm text-slate-700">{number + 1}. {item.label}</h4>
             <p className="text-sm leading-relaxed text-slate-600 mt-2 mb-4">{item.information}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div><label className="block text-xs font-bold text-slate-600 mb-2" htmlFor={`direction-${item.id}`}>Tindakan terhadap Untung Bersih</label>
+              <div><label className="block text-xs font-bold text-slate-600 mb-2" htmlFor={`direction-${item.id}`}>对净利润的调整方向</label>
                 <select id={`direction-${item.id}`} required disabled={!!feedback} value={answers[item.id]?.direction ?? ''}
                   className="w-full border border-slate-300 rounded-xl bg-white px-3 py-3 text-sm"
                   onChange={event => setAnswers(value => ({ ...value, [item.id]: { ...value[item.id], direction: event.target.value as ProfitDirection } }))}>
-                  <option value="">Pilih tindakan</option><option value="ADD">Tambah (+)</option><option value="SUBTRACT">Tolak (−)</option><option value="NONE">Tiada Pelarasan</option>
+                  <option value="">请选择调整方向</option><option value="ADD">Tambah (+)</option><option value="SUBTRACT">Tolak (−)</option><option value="NONE">Tiada Pelarasan</option>
                 </select>
               </div>
               <div><label className="block text-xs font-bold text-slate-600 mb-2" htmlFor={`amount-${item.id}`}>Amaun Pelarasan (RM)</label>
-                <input id={`amount-${item.id}`} type="number" min="0" step="0.01" inputMode="decimal" required disabled={!!feedback}
+                <input id={`amount-${item.id}`} type="number" min="0" step="0.01" inputMode="decimal" disabled={!!feedback}
                   value={answers[item.id]?.amount ?? ''} className="w-full p-3 text-sm font-mono"
                   onWheel={event => event.currentTarget.blur()}
                   onKeyDown={event => { if (['ArrowUp', 'ArrowDown'].includes(event.key)) event.preventDefault(); }}
@@ -92,7 +92,7 @@ export const ProfitAdjustmentDrill: React.FC<Props> = ({ onBack, onComplete }) =
           </section>)}
         </div>
         <div className="mt-5"><label htmlFor="adjusted-profit" className="block font-bold text-sm text-slate-700 mb-2">Untung Bersih Terselaras (RM)</label>
-          <input id="adjusted-profit" type="number" min="0" step="0.01" inputMode="decimal" required disabled={!!feedback} value={finalAnswer}
+          <input id="adjusted-profit" type="number" min="0" step="0.01" inputMode="decimal" disabled={!!feedback} value={finalAnswer}
             className="w-full p-3 font-mono" onWheel={event => event.currentTarget.blur()}
             onKeyDown={event => { if (['ArrowUp', 'ArrowDown'].includes(event.key)) event.preventDefault(); }}
             onChange={event => setFinalAnswer(event.target.value)} />
@@ -100,12 +100,12 @@ export const ProfitAdjustmentDrill: React.FC<Props> = ({ onBack, onComplete }) =
         {!feedback && <div className="flex justify-end mt-5"><Button type="submit" disabled={incomplete}>提交答案</Button></div>}
       </form>
       {feedback && <section className={`feedback-card ${feedback.isCorrect ? 'correct' : 'incorrect'}`} aria-live="polite">
-        <h3 className="text-xl mb-3">{feedback.isCorrect ? 'Jawapan Tepat!' : 'Jawapan Salah'}</h3>
+        <h3 className="text-xl mb-3">{feedback.isCorrect ? '回答正确！' : '回答错误'}</h3>
         <div className="space-y-4">
           {feedback.fields.map(item => <div key={item.id} className="border-b border-slate-200 pb-3 text-sm leading-relaxed">
             <h4 className={`font-bold ${item.correct ? 'text-green-700' : 'text-rose-700'}`}>{item.correct ? '✓' : '✗'} {item.label}</h4>
-            <p className="text-slate-600">你的答案：{answers[item.id]?.direction ? directionLabels[answers[item.id].direction!] : '—'} RM{answers[item.id]?.amount}</p>
-            <p className="font-bold text-slate-700">Jawapan: {directionLabels[item.direction]} RM{money(item.amount)}</p>
+            <p className="text-slate-600">你的答案：{answers[item.id]?.direction ? directionLabels[answers[item.id].direction!] : '—'} RM{answers[item.id]?.amount || '0'}</p>
+            <p className="font-bold text-slate-700">正确答案：{directionLabels[item.direction]} RM{money(item.amount)}</p>
             {item.calculation && <p className="font-mono mt-1">{item.calculation}</p>}
             <p className="text-slate-700 mt-1">{getProfitAdjustmentReason(item).malay}</p>
             <p className="text-slate-700 mt-1">中文说明：{getProfitAdjustmentReason(item).chinese}</p>
