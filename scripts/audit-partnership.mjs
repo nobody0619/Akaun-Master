@@ -70,19 +70,22 @@ const profitKeys = [
   { final: 36460, items: [['SUBTRACT', 1200], ['ADD', 300], ['SUBTRACT', 240], ['SUBTRACT', 400]] },
 ];
 assert.equal(PROFIT_ADJUSTMENT_QUESTIONS.length, 10);
+for (const [label, direction] of [['Utiliti Belum Bayar', 'SUBTRACT'], ['Insurans Prabayar', 'ADD'], ['Komisen Belum Terima', 'ADD'], ['Sewa Belum Terperoleh', 'SUBTRACT']]) {
+  const items = PROFIT_ADJUSTMENT_QUESTIONS.flatMap(q => q.items).filter(item => item.label === label);
+  assert(items.length > 0, `${label} must be covered`);
+  assert(items.every(item => getProfitAdjustmentDirection(item) === direction));
+}
 for (const [index, q] of PROFIT_ADJUSTMENT_QUESTIONS.entries()) {
   const key = profitKeys[index];
   assert.equal(getAdjustedProfit(q), key.final, q.id);
   assert.deepEqual(q.items.map(item => [getProfitAdjustmentDirection(item), item.amount]), key.items, q.id);
   assert(q.items.every(item => Number.isInteger(item.amount) && item.amount >= 0));
   const answers = Object.fromEntries(q.items.map((item, number) => [item.id, { direction: key.items[number][0], amount: String(key.items[number][1]) }]));
-  assert(gradeProfitAdjustmentAnswers(q, answers, String(key.final)).isCorrect);
-  assert(!gradeProfitAdjustmentAnswers(q, answers, '').isCorrect);
-  assert(!gradeProfitAdjustmentAnswers(q, answers, String(key.final + 1)).isCorrect);
+  assert(gradeProfitAdjustmentAnswers(q, answers).isCorrect, 'Only item directions and amounts are assessed');
   for (const item of q.items) {
-    assert.equal(gradeProfitAdjustmentAnswers(q, { ...answers, [item.id]: { ...answers[item.id], amount: '' } }, String(key.final)).isCorrect, item.amount === 0);
+    assert.equal(gradeProfitAdjustmentAnswers(q, { ...answers, [item.id]: { ...answers[item.id], amount: '' } }).isCorrect, item.amount === 0);
     const wrongDirection = getProfitAdjustmentDirection(item) === 'ADD' ? 'SUBTRACT' : 'ADD';
-    assert(!gradeProfitAdjustmentAnswers(q, { ...answers, [item.id]: { ...answers[item.id], direction: wrongDirection } }, String(key.final)).isCorrect);
+    assert(!gradeProfitAdjustmentAnswers(q, { ...answers, [item.id]: { ...answers[item.id], direction: wrongDirection } }).isCorrect);
   }
 }
 console.log('Perkongsian audit passed: 30 fixed questions; whole-ringgit answers; missing/partly/fully paid cases; account traps; all profit-adjustment signs, amounts and totals; zero/empty input checks.');

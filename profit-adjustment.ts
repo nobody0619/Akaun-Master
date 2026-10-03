@@ -99,7 +99,7 @@ const rules: Record<ProfitEffect, { direction: ProfitDirection; malay: string; c
 export const getProfitAdjustmentDirection = (item: ProfitAdjustmentItem) => rules[item.effect].direction;
 export const getAdjustedProfit = (q: ProfitAdjustmentQuestion) => q.items.reduce((profit, item) => profit + (rules[item.effect].direction === 'ADD' ? item.amount : rules[item.effect].direction === 'SUBTRACT' ? -item.amount : 0), q.initialProfit);
 
-export const gradeProfitAdjustmentAnswers = (q: ProfitAdjustmentQuestion, answers: Record<string, ProfitAdjustmentAnswer>, finalAnswer: string) => {
+export const gradeProfitAdjustmentAnswers = (q: ProfitAdjustmentQuestion, answers: Record<string, ProfitAdjustmentAnswer>) => {
   const fields = q.items.map(item => {
     const answer = answers[item.id] ?? {};
     const amount = answer.amount?.trim() ?? '';
@@ -107,9 +107,7 @@ export const gradeProfitAdjustmentAnswers = (q: ProfitAdjustmentQuestion, answer
     return { ...item, direction: rules[item.effect].direction, correct: answer.direction === rules[item.effect].direction && Number.isFinite(value) && value >= 0 && Math.abs(value - item.amount) < 0.005 };
   });
   const expectedProfit = getAdjustedProfit(q);
-  const finalValue = Number(finalAnswer.trim() || '0');
-  const finalCorrect = Number.isFinite(finalValue) && Math.abs(finalValue - expectedProfit) < 0.005;
-  return { fields, expectedProfit, finalCorrect, isCorrect: finalCorrect && fields.every(field => field.correct) };
+  return { fields, expectedProfit, isCorrect: fields.every(field => field.correct) };
 };
 
 export const getProfitAdjustmentReason = (item: ProfitAdjustmentItem) => rules[item.effect];

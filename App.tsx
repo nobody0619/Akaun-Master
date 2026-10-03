@@ -23,7 +23,7 @@ const BrandLockup = () => (
     <span className="brand-symbol">A</span>
     <span>
       <span className="brand-name block">Akaun Master</span>
-      <span className="brand-caption block">会计练习平台</span>
+      <span className="brand-caption block">纪大师会计练习平台</span>
     </span>
   </div>
 );
@@ -999,7 +999,7 @@ export default function App() {
                                         )}
                                     </div>
                                     <p className="text-slate-800">
-                                        附加资料： <br/>
+                                        Maklumat Tambahan： <br/>
                                         Peruntukan hutang ragu diselaraskan <strong>{q.rate}%</strong> atas Akaun Belum Terima bersih.
                                     </p>
                                 </div>
@@ -1051,7 +1051,7 @@ export default function App() {
                                         )}
                                     </div>
                                     <p className="text-slate-800">
-                                        附加资料： <br/>
+                                        Maklumat Tambahan： <br/>
                                         {q.assetName} disusutnilaikan menggunakan kaedah <strong>{q.methodType === 'STRAIGHT_LINE' ? `Garis Lurus (${q.rate}%)` : q.methodType === 'REDUCING_BALANCE' ? `Baki Berkurangan (${q.rate}%)` : `Nilai Skrap`}</strong>.
                                     </p>
                                 </div>
@@ -1097,7 +1097,7 @@ export default function App() {
                                             <span className="font-bold">RM {q.trialBalanceAmount}</span>
                                         </div>
                                         {q.yearEndDate && <div className="text-xs text-slate-500 mb-2">Tahun berakhir: {q.yearEndDate}</div>}
-                                        <p className="text-slate-800 italic mt-2">附加资料：{q.adjustmentInfo}</p>
+                                        <p className="text-slate-800 italic mt-2">Maklumat Tambahan：{q.adjustmentInfo}</p>
                                     </div>
                                 </div>
                                 <div className="space-y-6">
@@ -1221,7 +1221,7 @@ export default function App() {
                                         </div>
                                     </div>
                                     <p className="text-slate-800 text-sm">
-                                        附加资料： <br/>
+                                        Maklumat Tambahan： <br/>
                                         Pinjaman RM {formatMoney(q.principal)} telah {q.isNewLoan ? 'dibuat' : 'diperoleh'} pada {q.loanDateStr}. Tempoh pinjaman ialah {q.durationYears} tahun dan tarikh matang ialah {q.maturityDateStr}.
                                     </p>
                                 </div>

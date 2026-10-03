@@ -4,6 +4,8 @@ Akaun Master 是一个会计互动练习平台。整体界面、首页标语、�
 
 ## Latihan Perkongsian
 
+Penyata Pelarasan Untung Rugi 只考各项加减方向与调整金额，不要求填写调整后净利润；总额仅在提交后自动显示供参考。覆盖 Belanja belum bayar、Belanja prabayar、Hasil belum terima 与 Hasil belum terperoleh。
+
 Faedah atas Pinjaman、Gaji Pekongsi 和 Penyata Pelarasan Untung Rugi 各有 10 道固定题，参考教师提供的例题重新设计。借款利息包含 7 道全年题与 3 道按日期计算的题（3、6、9 个月）；薪金为全年金额，所有答案均为整数。包含试算表未列出已付金额、部分已付及全部已付三种情况。题干简短，提交后显示马来文计算与中文解析；金额留空按 0 判断，不跳过评分。
 
 贷款利息的本期金额列入 Akaun Untung Rugi，Akaun Pengasingan Untung Rugi 为 0；合伙人薪金的全年金额列入 Akaun Pengasingan Untung Rugi。两类题中的 Akaun Semasa 均要求填未付净调整额（本期应付减已付），不是往来账户的期末总余额。借款利息仅填写这三个账户，没有额外的全年利息填写栏。

@@ -60,7 +60,7 @@ export const PartnershipDrill: React.FC<Props> = ({ topic, onBack, onComplete })
         <div className="drill-topbar">
           <div className="brand-lockup" aria-label="Akaun Master">
             <span className="brand-symbol">A</span>
-            <span><span className="brand-name block">Akaun Master</span><span className="brand-caption block">会计练习平台</span></span>
+            <span><span className="brand-name block">Akaun Master</span><span className="brand-caption block">纪大师会计练习平台</span></span>
           </div>
           <div className="drill-nav-actions">
             <button className="icon-button" onClick={onBack} aria-label="返回主页">←</button>
@@ -92,7 +92,7 @@ export const PartnershipDrill: React.FC<Props> = ({ topic, onBack, onComplete })
             </table>
           </div>
           <section className="mb-6 text-sm leading-relaxed text-slate-700">
-            <h3 className="text-lg mb-2">附加资料</h3>
+            <h3 className="text-lg mb-2">Maklumat Tambahan</h3>
             {topic === 'INTEREST'
               ? <><p>Faedah atas pinjaman pada kadar {q.rate}% setahun.</p>{q.loanStart && <p>Pinjaman bermula pada {q.loanStart}.</p>}</>
               : <p>Gaji {q.partner} RM{money(q.annualEntitlement)} setahun.</p>}

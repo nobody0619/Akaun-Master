@@ -17,7 +17,6 @@ export const ProfitAdjustmentDrill: React.FC<Props> = ({ onBack, onComplete }) =
   const [score, setScore] = useState(0);
   const [elapsed, setElapsed] = useState(0);
   const [answers, setAnswers] = useState<Record<string, ProfitAdjustmentAnswer>>({});
-  const [finalAnswer, setFinalAnswer] = useState('');
   const [feedback, setFeedback] = useState<ReturnType<typeof gradeProfitAdjustmentAnswers> | null>(null);
   const q = queue[index];
   const progress = Math.round((index + 1) / queue.length * 100);
@@ -32,7 +31,7 @@ export const ProfitAdjustmentDrill: React.FC<Props> = ({ onBack, onComplete }) =
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
     if (feedback || incomplete) return;
-    const result = gradeProfitAdjustmentAnswers(q, answers, finalAnswer);
+    const result = gradeProfitAdjustmentAnswers(q, answers);
     setFeedback(result);
     setScore(value => value + (result.isCorrect ? (q.isPenalty ? 1 : 2) : -1));
     if (!result.isCorrect) setQueue(value => [...value,
@@ -44,7 +43,7 @@ export const ProfitAdjustmentDrill: React.FC<Props> = ({ onBack, onComplete }) =
   const next = () => {
     if (index === queue.length - 1) { onComplete(score, elapsed); return; }
     setIndex(value => value + 1);
-    setAnswers({}); setFinalAnswer(''); setFeedback(null);
+    setAnswers({}); setFeedback(null);
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
   const additions = feedback?.fields.filter(item => item.direction === 'ADD').reduce((sum, item) => sum + item.amount, 0) ?? 0;
@@ -52,7 +51,7 @@ export const ProfitAdjustmentDrill: React.FC<Props> = ({ onBack, onComplete }) =
 
   return <div className="app-background"><main className="drill-shell">
     <div className="drill-topbar">
-      <div className="brand-lockup" aria-label="Akaun Master"><span className="brand-symbol">A</span><span><span className="brand-name block">Akaun Master</span><span className="brand-caption block">会计练习平台</span></span></div>
+      <div className="brand-lockup" aria-label="Akaun Master"><span className="brand-symbol">A</span><span><span className="brand-name block">Akaun Master</span><span className="brand-caption block">纪大师会计练习平台</span></span></div>
       <div className="drill-nav-actions"><button className="icon-button" onClick={onBack} aria-label="返回主页">←</button><div className="score-pill">得分 {score}</div></div>
     </div>
     <div className="drill-meta">
@@ -66,8 +65,8 @@ export const ProfitAdjustmentDrill: React.FC<Props> = ({ onBack, onComplete }) =
         <p>Untung bersih bagi tahun berakhir 31 Disember 2024 sebelum pelarasan:</p>
         <p className="font-mono text-2xl font-bold text-[#0f2942] mt-2">RM{money(q.initialProfit)}</p>
       </div>
-      <h3 className="text-lg mb-2">附加资料与调整</h3>
-      <p className="text-sm text-slate-600 mb-5">选择加减方向，填写金额与调整后净利润；金额留空按 0 计算。</p>
+      <h3 className="text-lg mb-2">Maklumat Tambahan</h3>
+      <p className="text-sm text-slate-600 mb-5">选择加减方向并填写调整金额；金额留空按 0 计算。</p>
       <form onSubmit={submit}>
         <div className="space-y-5">
           {q.items.map((item, number) => <section key={item.id} className="border border-slate-200 rounded-xl p-4">
@@ -91,12 +90,6 @@ export const ProfitAdjustmentDrill: React.FC<Props> = ({ onBack, onComplete }) =
             </div>
           </section>)}
         </div>
-        <div className="mt-5"><label htmlFor="adjusted-profit" className="block font-bold text-sm text-slate-700 mb-2">Untung Bersih Terselaras (RM)</label>
-          <input id="adjusted-profit" type="number" min="0" step="0.01" inputMode="decimal" disabled={!!feedback} value={finalAnswer}
-            className="w-full p-3 font-mono" onWheel={event => event.currentTarget.blur()}
-            onKeyDown={event => { if (['ArrowUp', 'ArrowDown'].includes(event.key)) event.preventDefault(); }}
-            onChange={event => setFinalAnswer(event.target.value)} />
-        </div>
         {!feedback && <div className="flex justify-end mt-5"><Button type="submit" disabled={incomplete}>提交答案</Button></div>}
       </form>
       {feedback && <section className={`feedback-card ${feedback.isCorrect ? 'correct' : 'incorrect'}`} aria-live="polite">
@@ -117,7 +110,7 @@ export const ProfitAdjustmentDrill: React.FC<Props> = ({ onBack, onComplete }) =
           <div className="flex justify-between gap-3"><span>Untung Bersih Sebelum Pelarasan</span><span className="font-mono">RM{money(q.initialProfit)}</span></div>
           <div className="flex justify-between gap-3"><span>Tambah (+)</span><span className="font-mono">RM{money(additions)}</span></div>
           <div className="flex justify-between gap-3"><span>Tolak (−)</span><span className="font-mono">RM{money(deductions)}</span></div>
-          <div className="flex justify-between gap-3 border-t border-slate-300 pt-2 font-bold"><span>{feedback.finalCorrect ? '✓' : '✗'} Untung Bersih Terselaras</span><span className="font-mono">RM{money(feedback.expectedProfit)}</span></div>
+          <div className="flex justify-between gap-3 border-t border-slate-300 pt-2 font-bold"><span>Untung Bersih Terselaras（自动计算，不计分）</span><span className="font-mono">RM{money(feedback.expectedProfit)}</span></div>
         </div>
         <p className="text-sm text-slate-700 mt-3">中文说明：调整后净利润 = 原净利润 + 加回金额 - 扣除金额 = RM{money(q.initialProfit)} + RM{money(additions)} - RM{money(deductions)} = RM{money(feedback.expectedProfit)}。</p>
         {!feedback.isCorrect && <p className="text-sm text-rose-700 mt-3">这道题会在后面再练习两次，巩固加减方向。</p>}
