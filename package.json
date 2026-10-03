@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "audit:questions": "node --experimental-strip-types scripts/audit-questions.mjs"
+    "audit:questions": "node --experimental-strip-types scripts/audit-questions.mjs",
+    "audit:partnership": "node --experimental-strip-types scripts/audit-partnership.mjs"
   },
   "dependencies": {
     "react": "^19.2.0",
@@ -20,3 +21,4 @@
     "vite": "^6.2.0"
   }
 }
+

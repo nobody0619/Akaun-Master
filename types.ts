@@ -12,7 +12,10 @@ export enum ScreenState {
   DRILL_LOAN = 'DRILL_LOAN',
   DRILL_DISPOSAL_L1 = 'DRILL_DISPOSAL_L1',
   DRILL_DISPOSAL_L2 = 'DRILL_DISPOSAL_L2',
-  DRILL_TPM = 'DRILL_TPM'
+  DRILL_TPM = 'DRILL_TPM',
+  DRILL_PARTNERSHIP_INTEREST = 'DRILL_PARTNERSHIP_INTEREST',
+  DRILL_PARTNERSHIP_SALARY = 'DRILL_PARTNERSHIP_SALARY',
+  DRILL_PROFIT_ADJUSTMENT = 'DRILL_PROFIT_ADJUSTMENT'
 }
 
 export interface GameItem {
@@ -219,3 +222,4 @@ export interface DrillTpmQuestion {
   explanation: string;
   isPenalty?: boolean;
 }
+

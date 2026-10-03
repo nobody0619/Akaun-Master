@@ -3,6 +3,8 @@ import { ScreenState, GameItem, LeaderboardEntry, LevelConfig, DropZoneData, Dri
 import { LEVELS, generatePhrQuestion, generateSnQuestion, ACCRUALS_L1_QUESTIONS, ACCRUALS_L2_QUESTIONS, generateBadDebtQuestion, generateLoanQuestion, generateDisposalQuestion, generateTpmQuestion } from './constants';
 import { saveScore, getScores } from './services/leaderboardService';
 import { Button } from './components/Button';
+import { PartnershipDrill } from './components/PartnershipDrill';
+import { ProfitAdjustmentDrill } from './components/ProfitAdjustmentDrill';
 
 // -- Helper --
 const formatTime = (seconds: number) => {
@@ -61,7 +63,7 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
     .filter((s) => filter === 'ALL' || s.levelId === filter)
     .sort((a, b) => b.score - a.score || a.time - b.time);
 
-  const levels = ['ALL', '1', 'DRILL-PHR', 'DRILL-SN', 'DRILL-ACC-L1', 'DRILL-ACC-L2', 'DRILL-HL', 'DRILL-LOAN', 'DRILL-DISP-L1', 'DRILL-DISP-L2', 'DRILL-TPM'];
+  const levels = ['ALL', '1', 'DRILL-PHR', 'DRILL-SN', 'DRILL-ACC-L1', 'DRILL-ACC-L2', 'DRILL-HL', 'DRILL-LOAN', 'DRILL-DISP-L1', 'DRILL-DISP-L2', 'DRILL-TPM', 'DRILL-PARTNERSHIP-INTEREST', 'DRILL-PARTNERSHIP-SALARY', 'DRILL-PROFIT-ADJUSTMENT'];
   const levelLabels: Record<string, string> = {
     ALL: 'Semua Latihan',
     '1': 'Akaun Perdagangan',
@@ -74,6 +76,9 @@ const LeaderboardView: React.FC<{ onBack: () => void; currentLevelId: string }> 
     'DRILL-DISP-L1': 'Pelupusan Aset · Asas',
     'DRILL-DISP-L2': 'Pelupusan Aset · Lanjutan',
     'DRILL-TPM': 'Titik Pulang Modal',
+    'DRILL-PARTNERSHIP-INTEREST': 'Perkongsian · Faedah atas Pinjaman',
+    'DRILL-PARTNERSHIP-SALARY': 'Perkongsian · Gaji Pekongsi',
+    'DRILL-PROFIT-ADJUSTMENT': 'Penyata Pelarasan Untung Rugi',
   };
 
   return (
@@ -714,7 +719,7 @@ export default function App() {
                               通过专题练习、即时反馈与清晰解析，逐步建立扎实的会计基础。
                           </p>
                           <div className="feature-strip" aria-label="主要功能">
-                              <span className="feature-chip"><span className="feature-dot"/>9 个练习主题</span>
+                              <span className="feature-chip"><span className="feature-dot"/>12 个练习主题</span>
                               <span className="feature-chip"><span className="feature-dot"/>即时答题反馈</span>
                               <span className="feature-chip"><span className="feature-dot"/>练习成绩记录</span>
                           </div>
@@ -749,6 +754,29 @@ export default function App() {
               </main>
           </div>
       );
+  }
+
+  if (currentScreen === ScreenState.DRILL_PARTNERSHIP_INTEREST || currentScreen === ScreenState.DRILL_PARTNERSHIP_SALARY) {
+      const topic = currentScreen === ScreenState.DRILL_PARTNERSHIP_INTEREST ? 'INTEREST' : 'SALARY';
+      return <PartnershipDrill key={topic} topic={topic}
+          onBack={() => { setCurrentScreen(ScreenState.MENU); window.scrollTo({ top: 0, behavior: 'instant' }); }}
+          onComplete={(partnershipScore, partnershipTime) => {
+              const levelId = topic === 'INTEREST' ? 'DRILL-PARTNERSHIP-INTEREST' : 'DRILL-PARTNERSHIP-SALARY';
+              setSelectedLevelId(levelId);
+              saveScore({ name: userName, levelId, score: partnershipScore, time: partnershipTime, timestamp: Date.now() });
+              setCurrentScreen(ScreenState.LEADERBOARD);
+          }} />;
+  }
+
+  if (currentScreen === ScreenState.DRILL_PROFIT_ADJUSTMENT) {
+      return <ProfitAdjustmentDrill
+          onBack={() => { setCurrentScreen(ScreenState.MENU); window.scrollTo({ top: 0, behavior: 'instant' }); }}
+          onComplete={(profitScore, profitTime) => {
+              const levelId = 'DRILL-PROFIT-ADJUSTMENT';
+              setSelectedLevelId(levelId);
+              saveScore({ name: userName, levelId, score: profitScore, time: profitTime, timestamp: Date.now() });
+              setCurrentScreen(ScreenState.LEADERBOARD);
+          }} />;
   }
 
   // --- GENERIC RENDER for PHR/SN/Accruals/Loan/Disposal/TPM needs to show score ---
@@ -1354,6 +1382,11 @@ export default function App() {
       { code: 'A2', title: 'Pelupusan Aset · Lanjutan', description: '同时处理已出售与仍持有的资产。', accent: 'topic-gold', action: () => initializeDrillDisposal(2) },
       { code: 'TPM', title: 'Titik Pulang Modal', description: '练习固定成本、边际贡献与目标利润。', accent: 'topic-blue', action: initializeDrillTpm },
   ];
+  const partnershipTopics = [
+      { code: 'FP', title: 'Faedah atas Pinjaman', description: '计算全年利息，并判断 UR、Pengasingan 与 Akaun Semasa 的金额。', accent: 'topic-green', screen: ScreenState.DRILL_PARTNERSHIP_INTEREST },
+      { code: 'GP', title: 'Gaji Pekongsi', description: '区分全年薪金与已付金额，练习 Pengasingan 和 Akaun Semasa。', accent: 'topic-purple', screen: ScreenState.DRILL_PARTNERSHIP_SALARY },
+      { code: 'UB', title: 'Penyata Pelarasan Untung Rugi', description: '判断每项调整应加或减，再计算调整后净利润。', accent: 'topic-gold', screen: ScreenState.DRILL_PROFIT_ADJUSTMENT },
+  ];
 
   return (
     <div className="app-background">
@@ -1373,8 +1406,8 @@ export default function App() {
                     <p>选择一个主题，按步骤作答，并在每题后查看解析。每次错题，都是巩固知识的机会。</p>
                 </div>
                 <div className="hero-stat-grid">
-                    <div className="hero-stat"><strong>9</strong><span>练习主题</span></div>
-                    <div className="hero-stat"><strong>∞</strong><span>动态题组</span></div>
+                    <div className="hero-stat"><strong>{topics.length + partnershipTopics.length}</strong><span>练习主题</span></div>
+                    <div className="hero-stat"><strong>30</strong><span>合伙专项题</span></div>
                     <div className="hero-stat"><strong>+2</strong><span>答对得分</span></div>
                     <div className="hero-stat"><strong>−1</strong><span>答错扣分</span></div>
                 </div>
@@ -1386,7 +1419,7 @@ export default function App() {
                         <span className="eyebrow">Koleksi Latihan</span>
                         <h2 id="topics-title">Pilih Topik untuk Bermula</h2>
                     </div>
-                    <p>每次练习都会生成新的题目顺序，并在作答后提供逐步解析。</p>
+                    <p>选择主题，完成练习，并在作答后查看逐步解析。</p>
                 </div>
                 <div className="topic-grid">
                     {topics.map((topic) => (
@@ -1394,6 +1427,26 @@ export default function App() {
                             <span className="topic-icon">{topic.code}</span>
                             <h3>{topic.title}</h3>
                             <p>{topic.description}</p>
+                            <span className="topic-link">开始练习 <span aria-hidden="true">→</span></span>
+                        </button>
+                    ))}
+                </div>
+            </section>
+
+            <section aria-labelledby="partnership-title">
+                <div className="section-heading">
+                    <div><span className="eyebrow">Latihan Pekongsi</span><h2 id="partnership-title">Perkongsian</h2></div>
+                    <p>每个专题 10 道固定题，练习账户归类、未付差额与净利润调整。</p>
+                </div>
+                <div className="topic-grid">
+                    {partnershipTopics.map(topic => (
+                        <button key={topic.screen} className={`topic-card ${topic.accent}`} onClick={() => {
+                            setIsTimerRunning(false);
+                            setCurrentScreen(topic.screen);
+                            window.scrollTo({ top: 0, behavior: 'instant' });
+                        }}>
+                            <span className="topic-icon">{topic.code}</span>
+                            <h3>{topic.title}</h3><p>{topic.description}</p>
                             <span className="topic-link">开始练习 <span aria-hidden="true">→</span></span>
                         </button>
                     ))}
