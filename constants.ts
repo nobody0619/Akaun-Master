@@ -93,12 +93,23 @@ export const generateSnQuestion = (): DrillSnQuestion => {
     const assetName = assets[Math.floor(Math.random() * assets.length)];
     const cost = (Math.floor(Math.random() * 8) + 2) * 10000; // 20k - 100k
     
-    const methodType = Math.random() > 0.5 ? 'STRAIGHT_LINE' : 'REDUCING_BALANCE';
-    const rate = [10, 15, 20][Math.floor(Math.random() * 3)];
+    const methodRoll = Math.floor(Math.random() * 3);
+    const methodType = methodRoll === 0 ? 'STRAIGHT_LINE' : methodRoll === 1 ? 'REDUCING_BALANCE' : 'SCRAP_VALUE';
+    const rate = methodType === 'SCRAP_VALUE' ? 0 : [10, 15, 20][Math.floor(Math.random() * 3)];
+    const usefulLife = methodType === 'SCRAP_VALUE' ? [4, 5, 10][Math.floor(Math.random() * 3)] : 0;
+    // Choose a scrap value divisible by the useful life so every answer is a whole RM.
+    const scrapUnit = usefulLife * 1000;
+    const maxScrapSteps = usefulLife ? Math.max(1, Math.floor((cost - 5000) / scrapUnit)) : 0;
+    const scrapValue = usefulLife ? (Math.floor(Math.random() * maxScrapSteps) + 1) * scrapUnit : 0;
     
     let oldAccDep = 0;
     // If reducing balance, ensure oldAccDep exists and is reasonable
-    if (methodType === 'REDUCING_BALANCE') {
+    if (methodType === 'SCRAP_VALUE') {
+        // Start at a valid earlier year so accumulated depreciation stays below
+        // the depreciable amount (cost less scrap value).
+        const yearlyExpense = (cost - scrapValue) / usefulLife;
+        oldAccDep = yearlyExpense * (Math.floor(Math.random() * (usefulLife - 1)) + 1);
+    } else if (methodType === 'REDUCING_BALANCE') {
         oldAccDep = cost * (Math.floor(Math.random() * 30) + 10) / 100; // 10-40% accumulated
     } else {
         oldAccDep = cost * (Math.floor(Math.random() * 30) + 10) / 100;
@@ -107,8 +118,10 @@ export const generateSnQuestion = (): DrillSnQuestion => {
     let expense = 0;
     if (methodType === 'STRAIGHT_LINE') {
         expense = cost * (rate / 100);
-    } else {
+    } else if (methodType === 'REDUCING_BALANCE') {
         expense = (cost - oldAccDep) * (rate / 100);
+    } else {
+        expense = (cost - scrapValue) / usefulLife;
     }
     
     return {
@@ -118,8 +131,8 @@ export const generateSnQuestion = (): DrillSnQuestion => {
         oldAccDep,
         methodType,
         rate,
-        scrapValue: 0,
-        usefulLife: 0,
+        scrapValue,
+        usefulLife,
         correctSnExpense: expense,
         correctCategory: 'BELANJA',
         correctNewAccDep: oldAccDep + expense

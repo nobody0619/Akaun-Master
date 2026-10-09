@@ -479,8 +479,8 @@ export default function App() {
              SNT akhir: RM${formatMoney(q.oldAccDep)} + RM${formatMoney(q.correctSnExpense)} = RM${formatMoney(q.correctNewAccDep)}.
 
              中文说明：
-             折旧费用根据题目指定的方法和折旧率计算；直线法按成本计算，余额递减法按未折旧余额计算。
-             折旧属于 BELANJA（费用）。期末累计折旧 SNT = 期初累计折旧 + 本期折旧费用。
+             折旧属于 BELANJA（费用）。Nilai Skrap 方法的年度折旧 =（资产成本 − Nilai Skrap）÷ 使用年限。
+             本期累计折旧 SNT = 期初累计折旧 + 本期折旧费用。
           `;
           setDrillFeedback({ isCorrect: false, message: explanation });
           const penaltyQ1 = { ...generateSnQuestion(), isPenalty: true };
@@ -1053,6 +1053,7 @@ export default function App() {
                                     <p className="text-slate-800">
                                         Maklumat Tambahan： <br/>
                                         {q.assetName} disusutnilaikan menggunakan kaedah <strong>{q.methodType === 'STRAIGHT_LINE' ? `Garis Lurus (${q.rate}%)` : q.methodType === 'REDUCING_BALANCE' ? `Baki Berkurangan (${q.rate}%)` : `Nilai Skrap`}</strong>.
+                                        {q.methodType === 'SCRAP_VALUE' && <><br/>Nilai skrap: RM {formatMoney(q.scrapValue)}; usia guna: {q.usefulLife} tahun.</>}
                                     </p>
                                 </div>
                                 <div className="space-y-6">
@@ -1373,7 +1374,7 @@ export default function App() {
   // --- MENU ---
   const topics = [
       { code: 'PHR', title: 'Peruntukan Hutang Ragu', description: '练习计算 PHR，并判断它对损益的影响。', accent: 'topic-orange', action: initializeDrillPhr },
-      { code: 'SN', title: 'Susut Nilai', description: '练习直线法与余额递减法。', accent: 'topic-blue', action: initializeDrillSn },
+      { code: 'SN', title: 'Susut Nilai', description: '练习直线法、余额递减法与 Nilai Skrap。', accent: 'topic-blue', action: initializeDrillSn },
       { code: 'P1', title: 'Pelarasan Asas', description: '辨认预付、应计项目并计算调整后金额。', accent: 'topic-purple', action: initializeDrillAccrualsL1 },
       { code: 'P2', title: 'Pelarasan Bertempoh', description: '练习涉及月份与会计期间的调整。', accent: 'topic-purple', action: initializeDrillAccrualsL2 },
       { code: 'HL', title: 'Hutang Lapuk', description: '区分坏账与坏账收回。', accent: 'topic-red', action: initializeDrillBadDebts },
