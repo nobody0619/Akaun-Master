@@ -469,9 +469,11 @@ export default function App() {
           setMistakes(m => m + 1);
           setScore(s => s - 1);
           let methodText = "";
-          if (q.methodType === 'STRAIGHT_LINE') methodText = `${q.cost} x ${q.rate}%`;
+          if (q.methodType === 'STRAIGHT_LINE') methodText = q.usesScrapValue
+              ? `(${q.cost} - ${q.scrapValue}) / ${q.usefulLife}`
+              : `${q.cost} x ${q.rate}%`;
           else if (q.methodType === 'REDUCING_BALANCE') methodText = `(${q.cost} - ${q.oldAccDep}) x ${q.rate}%`;
-          else methodText = `(${q.cost} - ${q.scrapValue}) / ${q.usefulLife}`;
+          else methodText = `(${q.cost} - ${q.oldAccDep}) - ${q.closingBookValue}`;
 
           const explanation = `
              Pengiraan: ${methodText} = RM${formatMoney(q.correctSnExpense)}.
@@ -479,7 +481,14 @@ export default function App() {
              SNT akhir: RM${formatMoney(q.oldAccDep)} + RM${formatMoney(q.correctSnExpense)} = RM${formatMoney(q.correctNewAccDep)}.
 
              中文说明：
-             折旧属于 BELANJA（费用）。Nilai Skrap 方法的年度折旧 =（资产成本 − Nilai Skrap）÷ 使用年限。
+             折旧属于 BELANJA（费用）。
+             {q.methodType === 'STRAIGHT_LINE'
+                 ? q.usesScrapValue
+                     ? 'Garis Lurus：年度折旧 =（资产成本 − Nilai Skrap）÷ 使用年限。'
+                     : 'Garis Lurus：年度折旧 = 资产成本 × 折旧率。'
+                 : q.methodType === 'REDUCING_BALANCE'
+                     ? 'Baki Berkurangan：年度折旧 =（资产成本 − 期初累计折旧）× 折旧率。'
+                     : 'Penilaian Semula：年度折旧 = 期初账面价值 − 期末重估账面价值。'}
              本期累计折旧 SNT = 期初累计折旧 + 本期折旧费用。
           `;
           setDrillFeedback({ isCorrect: false, message: explanation });
@@ -1052,8 +1061,9 @@ export default function App() {
                                     </div>
                                     <p className="text-slate-800">
                                         Maklumat Tambahan： <br/>
-                                        {q.assetName} disusutnilaikan menggunakan kaedah <strong>{q.methodType === 'STRAIGHT_LINE' ? `Garis Lurus (${q.rate}%)` : q.methodType === 'REDUCING_BALANCE' ? `Baki Berkurangan (${q.rate}%)` : `Nilai Skrap`}</strong>.
-                                        {q.methodType === 'SCRAP_VALUE' && <><br/>Nilai skrap: RM {formatMoney(q.scrapValue)}; usia guna: {q.usefulLife} tahun.</>}
+                                        {q.assetName} disusutnilaikan menggunakan kaedah <strong>{q.methodType === 'STRAIGHT_LINE' ? q.usesScrapValue ? 'Garis Lurus（直线法）' : `Garis Lurus（直线法，${q.rate}%）` : q.methodType === 'REDUCING_BALANCE' ? `Baki Berkurangan（余额递减法，${q.rate}%）` : 'Penilaian Semula（重估法）'}</strong>.
+                                        {q.methodType === 'STRAIGHT_LINE' && q.usesScrapValue && <><br/>Nilai skrap: RM {formatMoney(q.scrapValue)}; usia guna: {q.usefulLife} tahun.</>}
+                                        {q.methodType === 'REVALUATION' && <><br/>Nilai buku aset pada akhir tahun: RM {formatMoney(q.closingBookValue ?? 0)}.</>}
                                     </p>
                                 </div>
                                 <div className="space-y-6">
@@ -1374,7 +1384,7 @@ export default function App() {
   // --- MENU ---
   const topics = [
       { code: 'PHR', title: 'Peruntukan Hutang Ragu', description: '练习计算 PHR，并判断它对损益的影响。', accent: 'topic-orange', action: initializeDrillPhr },
-      { code: 'SN', title: 'Susut Nilai', description: '练习直线法、余额递减法与 Nilai Skrap。', accent: 'topic-blue', action: initializeDrillSn },
+      { code: 'SN', title: 'Susut Nilai', description: '练习三种折旧方法，并计算含 Nilai Skrap 的直线法题目。', accent: 'topic-blue', action: initializeDrillSn },
       { code: 'P1', title: 'Pelarasan Asas', description: '辨认预付、应计项目并计算调整后金额。', accent: 'topic-purple', action: initializeDrillAccrualsL1 },
       { code: 'P2', title: 'Pelarasan Bertempoh', description: '练习涉及月份与会计期间的调整。', accent: 'topic-purple', action: initializeDrillAccrualsL2 },
       { code: 'HL', title: 'Hutang Lapuk', description: '区分坏账与坏账收回。', accent: 'topic-red', action: initializeDrillBadDebts },

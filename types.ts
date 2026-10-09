@@ -84,10 +84,12 @@ export interface DrillSnQuestion {
   assetName: string;
   cost: number;
   oldAccDep: number;
-  methodType: 'STRAIGHT_LINE' | 'REDUCING_BALANCE' | 'SCRAP_VALUE';
+  methodType: 'STRAIGHT_LINE' | 'REDUCING_BALANCE' | 'REVALUATION';
   rate: number;
+  usesScrapValue?: boolean;
   scrapValue: number;
   usefulLife: number;
+  closingBookValue?: number;
   correctSnExpense: number;
   correctCategory: 'BELANJA' | 'HASIL';
   correctNewAccDep: number;
