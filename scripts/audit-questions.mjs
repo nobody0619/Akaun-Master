@@ -49,12 +49,12 @@ for (let index = 0; index < SAMPLE_SIZE; index += 1) {
 
   const sn = generateSnQuestion();
   const expectedSn = sn.methodType === 'STRAIGHT_LINE'
-    ? sn.usesScrapValue
-      ? (sn.cost - sn.scrapValue) / sn.usefulLife
-      : sn.cost * sn.rate / 100
+    ? sn.cost * sn.rate / 100
     : sn.methodType === 'REDUCING_BALANCE'
       ? (sn.cost - sn.oldAccDep) * sn.rate / 100
-      : sn.cost - sn.oldAccDep - sn.closingBookValue;
+      : sn.methodType === 'SCRAP_VALUE'
+        ? (sn.cost - sn.scrapValue) / sn.usefulLife
+        : sn.cost - sn.oldAccDep - sn.closingBookValue;
   stats.snDecimals += [sn.correctSnExpense, sn.correctNewAccDep].filter(hasDecimal).length;
   assert(close(sn.correctSnExpense, expectedSn), 'Susut Nilai', `sample ${index} expense mismatch`);
   assert(close(sn.correctNewAccDep, sn.oldAccDep + sn.correctSnExpense), 'Susut Nilai', `sample ${index} accumulated amount mismatch`);

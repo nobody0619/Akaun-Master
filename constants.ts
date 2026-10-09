@@ -93,11 +93,10 @@ export const generateSnQuestion = (): DrillSnQuestion => {
     const assetName = assets[Math.floor(Math.random() * assets.length)];
     const cost = (Math.floor(Math.random() * 8) + 2) * 10000; // 20k - 100k
     
-    const methodRoll = Math.floor(Math.random() * 3);
-    const methodType = methodRoll === 0 ? 'STRAIGHT_LINE' : methodRoll === 1 ? 'REDUCING_BALANCE' : 'REVALUATION';
-    const usesScrapValue = methodType === 'STRAIGHT_LINE' && Math.random() < 0.5;
-    const rate = methodType === 'REVALUATION' || usesScrapValue ? 0 : [10, 15, 20][Math.floor(Math.random() * 3)];
-    const usefulLife = usesScrapValue ? [4, 5, 10][Math.floor(Math.random() * 3)] : 0;
+    const methodRoll = Math.floor(Math.random() * 4);
+    const methodType = methodRoll === 0 ? 'STRAIGHT_LINE' : methodRoll === 1 ? 'REDUCING_BALANCE' : methodRoll === 2 ? 'SCRAP_VALUE' : 'REVALUATION';
+    const rate = methodType === 'REVALUATION' || methodType === 'SCRAP_VALUE' ? 0 : [10, 15, 20][Math.floor(Math.random() * 3)];
+    const usefulLife = methodType === 'SCRAP_VALUE' ? [4, 5, 10][Math.floor(Math.random() * 3)] : 0;
     // Choose a scrap value divisible by the useful life so every answer is a whole RM.
     const scrapUnit = usefulLife * 1000;
     const maxScrapSteps = usefulLife ? Math.max(1, Math.floor((cost - 5000) / scrapUnit)) : 0;
@@ -105,7 +104,7 @@ export const generateSnQuestion = (): DrillSnQuestion => {
     
     let oldAccDep = 0;
     // If reducing balance, ensure oldAccDep exists and is reasonable
-    if (usesScrapValue) {
+    if (methodType === 'SCRAP_VALUE') {
         // Start at a valid earlier year so accumulated depreciation stays below
         // the depreciable amount (cost less scrap value).
         const yearlyExpense = (cost - scrapValue) / usefulLife;
@@ -122,9 +121,11 @@ export const generateSnQuestion = (): DrillSnQuestion => {
 
     let expense = 0;
     if (methodType === 'STRAIGHT_LINE') {
-        expense = usesScrapValue ? (cost - scrapValue) / usefulLife : cost * (rate / 100);
+        expense = cost * (rate / 100);
     } else if (methodType === 'REDUCING_BALANCE') {
         expense = (cost - oldAccDep) * (rate / 100);
+    } else if (methodType === 'SCRAP_VALUE') {
+        expense = (cost - scrapValue) / usefulLife;
     } else if (methodType === 'REVALUATION') {
         expense = cost - oldAccDep - closingBookValue;
     }
@@ -136,7 +137,6 @@ export const generateSnQuestion = (): DrillSnQuestion => {
         oldAccDep,
         methodType,
         rate,
-        usesScrapValue,
         scrapValue,
         usefulLife,
         closingBookValue,

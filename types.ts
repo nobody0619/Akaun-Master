@@ -84,9 +84,8 @@ export interface DrillSnQuestion {
   assetName: string;
   cost: number;
   oldAccDep: number;
-  methodType: 'STRAIGHT_LINE' | 'REDUCING_BALANCE' | 'REVALUATION';
+  methodType: 'STRAIGHT_LINE' | 'REDUCING_BALANCE' | 'SCRAP_VALUE' | 'REVALUATION';
   rate: number;
-  usesScrapValue?: boolean;
   scrapValue: number;
   usefulLife: number;
   closingBookValue?: number;
