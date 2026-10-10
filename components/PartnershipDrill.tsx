@@ -13,9 +13,17 @@ interface Props {
 }
 
 const money = (amount: number) => new Intl.NumberFormat('ms-MY').format(amount);
+const shuffledCopy = <T,>(items: readonly T[]): T[] => {
+  const shuffled = [...items];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const otherIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[otherIndex]] = [shuffled[otherIndex], shuffled[index]];
+  }
+  return shuffled;
+};
 
 export const PartnershipDrill: React.FC<Props> = ({ topic, onBack, onComplete }) => {
-  const [queue, setQueue] = useState<PartnershipQuestion[]>(() => [...(topic === 'INTEREST' ? PARTNERSHIP_INTEREST_QUESTIONS : PARTNERSHIP_SALARY_QUESTIONS)]);
+  const [queue, setQueue] = useState<PartnershipQuestion[]>(() => shuffledCopy(topic === 'INTEREST' ? PARTNERSHIP_INTEREST_QUESTIONS : PARTNERSHIP_SALARY_QUESTIONS));
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [elapsed, setElapsed] = useState(0);

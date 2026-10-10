@@ -10,9 +10,17 @@ interface Props {
 
 const money = (amount: number) => new Intl.NumberFormat('ms-MY').format(amount);
 const directionLabels: Record<ProfitDirection, string> = { ADD: 'Tambah (+)', SUBTRACT: 'Tolak (−)', NONE: 'Tiada Pelarasan' };
+const shuffledCopy = <T,>(items: readonly T[]): T[] => {
+  const shuffled = [...items];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const otherIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[otherIndex]] = [shuffled[otherIndex], shuffled[index]];
+  }
+  return shuffled;
+};
 
 export const ProfitAdjustmentDrill: React.FC<Props> = ({ onBack, onComplete }) => {
-  const [queue, setQueue] = useState<ProfitAdjustmentQuestion[]>(() => [...PROFIT_ADJUSTMENT_QUESTIONS]);
+  const [queue, setQueue] = useState<ProfitAdjustmentQuestion[]>(() => shuffledCopy(PROFIT_ADJUSTMENT_QUESTIONS));
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [elapsed, setElapsed] = useState(0);
